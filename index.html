@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="./style.css">
+    <title>Music</title>
+    <script type="importmap">
+      {
+          "imports": {
+              "three": "./node_modules/three/build/three.module.js",
+              "troika-three-text": "./node_modules/troika-three-text/dist/troika-three-text.esm.js",
+              "troika-worker-utils": "./node_modules/troika-worker-utils/dist/troika-worker-utils.esm.js",
+              "webgl-sdf-generator": "./node_modules/webgl-sdf-generator/dist/webgl-sdf-generator.min.mjs",
+              "troika-three-utils": "./node_modules/troika-three-utils/dist/troika-three-utils.esm.js",
+              "bidi-js": "./node_modules/bidi-js/dist/bidi.mjs"
+          }
+      }
+  </script>
+  </head>
+  <body>
+    <div id="canvas">
+      <script type="module" src="src/main.js"></script>
+
+      <div id="popup-exhibit" class="popup-exhibit">
+        <div class="element-exhibit">
+          <div id="popup-exhibit-title" class="title"></div>
+          <div id="popup-exhibit-description" class="description"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

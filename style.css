@@ -1,0 +1,159 @@
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #ffffff;
+  margin-top: 0px;
+  padding: 0px;
+  position: absolute;
+	z-index: 100;
+	display:block;
+  background-color: black;
+  font-family: 'didot';
+}
+
+@font-face {
+  font-family: 'didot';
+  src:  url('fonts/GFSDidot-Regular.ttf');
+  font-weight: 100;
+  font-style: normal;
+  font-display: block;
+}
+
+.element-exhibit {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
+}
+
+html, body {
+  overscroll-behavior-y: contain;
+  touch-action: none;
+  margin:0;
+  padding:0;
+  background-color: black;
+  font-family: 'didot';
+}
+
+p {
+  margin: 0px;
+  padding: 0px;
+}
+
+#popup-exhibit-description::-webkit-scrollbar-track{
+  border-radius: 10px;
+  background-color: transparent;
+}
+
+#popup-exhibit-description::-webkit-scrollbar{
+  width: 1.1em;
+  background-color: transparent;
+}
+
+#popup-exhibit-description::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  background-color: #9b722f;
+}
+
+
+.popup-exhibit {
+  position: fixed;
+  bottom: -55%;
+  opacity:0.8;
+  width: calc(100vw);
+  height: calc(100vh/2.7);
+  background: #000000;
+  border-top: 0.20vw solid #9b722f;
+  box-sizing:border-box;
+  z-index:2;
+  text-align: left;
+  opacity:1;
+  color:white;
+  font-family: 'didot';
+}
+
+.element-exhibit{
+  margin:35px 20px;
+}
+
+#popup-exhibit-title{
+  text-align:center;
+  margin-top: 3vw;
+}
+
+.popup-exhibit .title {
+  font-size: 3vw;
+  font-weight:600 !important;
+}
+
+.popup-exhibit .description {
+  margin-top: 2vw;
+  margin-left: 10vw;
+  margin-right: 0vw;
+  height: calc(100vh/4.5);
+  color:white;
+  padding:0.2vw;
+  padding-right: 10vw;
+  font-size: 3vw;
+  font-weight:200;
+  overflow-y: scroll;
+}
+
+.popup-exhibit > div {
+  position:relative;
+  opacity:0;
+}
+
+.popup-exhibit > div {
+  top: 0px;
+  opacity: 1;
+}
+
+.popup-exhibit .title {
+  transition: all 300ms ease-in-out 300ms;
+}
+
+.popup-exhibit .description {
+  transition: all 300ms ease-in-out 350ms;
+  overflow: auto; /* Enable scroll if needed */
+}
+
+
+.popup-exhibit.slide-in {
+  bottom: -75%;
+  animation-name: slide-in;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+.popup-exhibit.slide-out {
+  animation-name: slide-out;
+  animation-duration: 0.4s;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
+
+
+@keyframes slide-in {
+  0% {
+    bottom: -75%; 
+  }
+  100% {
+    bottom: 0%; 
+  }
+}
+
+@keyframes slide-out {
+  0% {
+    bottom: 0%; 
+  }
+  100% {
+    bottom: -75%; 
+  }
+}
