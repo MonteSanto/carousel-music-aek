@@ -1,5 +1,6 @@
 import { exhibits } from "./variable.js";
 import {Plane} from './plane.js';
+import {Sound} from './sound.js';
 
 
 class Carousel{
@@ -15,6 +16,10 @@ class Carousel{
     testMaxValue = 0;
     testMinValue = 0;
 
+    sound;
+    planesPromise;
+    musicButtons = [];
+
     constructor(scene, imagesPerRevolution = 12, spiraleThreadHeight = 0){
         this.imagesPerRevolution = imagesPerRevolution;
 
@@ -24,9 +29,15 @@ class Carousel{
         this.halfAnglePartitioning = this.anglePartitioning / 2;
         this.heightPartitioning = spiraleThreadHeight / imagesPerRevolution;
 
-        for (let i = 0; i < exhibits.length; i++) {
-            this.planes.push( new Plane(exhibits[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning));
-        }
+        this.sound = new Sound("sounds/track_1.wav");
+        
+        this.planesPromise = new Promise(() => {
+            for (let i = 0; i < exhibits.length; i++) {
+                this.planes.push( new Plane(exhibits[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning, this.musicButtons));
+            }
+        });
+
+        this.getMusicButtons();
     }
 
     getAngularDistanceToCloserObjectNormalized(){
@@ -120,8 +131,13 @@ class Carousel{
         }
     }
 
-    
-
+    getMusicButtons(){
+        this.planesPromise.then(() => {
+            this.planes.forEach(plane => {
+                this.musicButtons.push(plane.playPlane);
+            })
+        });
+    }
 }
 
 export {Carousel}

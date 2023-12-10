@@ -7,12 +7,12 @@ import { getTextureLoader } from './loaders.js';
 import Animation from './animation.js';
 
 
-let scene, renderer, camera, raycaster, skyDomeScene, skyDome, skyMaterial, ui, backgroundLogo;
+let scene, renderer, camera, raycaster, skyDomeScene, skyDome, skyMaterial, ui, backgroundLogo, mouseCoordinates;
 let carousel;
 let distanceX = 0;
 let speed = 0;
 
-let spiraleThreadHeight = 0.70;
+let spiraleThreadHeight = 1;
 let itemsPerRevolution = 8;
 let cameraDefaultZ = 1.58;
 let cameraMaxZ = 3.5;
@@ -26,7 +26,6 @@ const clock = new THREE.Clock();
 let previousDistanceX = 0;
 let cameraPositionOffset = new THREE.Vector3(0, -0.05, 0);
 
-let stats;
 let firstTouchId = null;
 
 let idle = false;
@@ -40,17 +39,19 @@ let hasKinetic = false;
 
 let popUp;
 
-let selectedPlane = {current: 0, onClick: function() {goToStart=true; popUp.close()} };
+let selectedPlane = {current: 5, onClick: function() {goToStart=true; popUp.close()} };
 
 let zoomAnimationOut;
 let zoomAnimationIn;
 
 let goToStart = false;
 
+let selectedExhibit;
 
 function init(){
 	raycaster = new THREE.Raycaster();
 	raycaster.far = 0.8;
+	mouseCoordinates = new THREE.Vector2();
 
 	//STATS
 	// stats = new Stats();
@@ -163,14 +164,14 @@ function init(){
 		goToStart = false;
 		onClick(event);
 
-    idleTime = 0;
-    if(idle){
-              
-      zoomAnimationIn.play();
-    }
-    idle = false;
-    //event.preventDefault();
-    isMouseDown = true;
+		idleTime = 0;
+		if(idle){
+				
+		zoomAnimationIn.play();
+		}
+		idle = false;
+		//event.preventDefault();
+		isMouseDown = true;
 	});
 
 	document.addEventListener('pointermove', (event) => {
@@ -195,6 +196,8 @@ function init(){
 
 	//CAROUSEL
 	carousel = new Carousel(scene, itemsPerRevolution, spiraleThreadHeight);
+	
+	//UI
 	ui = new UI(popUp, selectedPlane);
 
 	// ZOOM ANIMATION
@@ -206,7 +209,7 @@ function init(){
     	})
 		ui.setTitleOpacity(alpha);
 		ui.setStartButtonOpacity(1-alpha);
-    	selectedPlane.current = 70;
+    	selectedPlane.current = 5;
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
@@ -238,7 +241,7 @@ function init(){
 		const mesh = new THREE.Mesh( geometry, material);
 		mesh.position.set(0, 0);
 
-		//scene.add(mesh);
+		scene.add(mesh);
 	});
 
 	document.addEventListener('keydown', (event) => {
@@ -257,6 +260,19 @@ function onWindowResize() {
 
 function onClick(event) {
 	ui.onClick(event.clientX, event.clientY);
+
+	mouseCoordinates.x = ( window.event.clientX / window.innerWidth ) * 2 - 1;
+	mouseCoordinates.y = -( window.event.clientY / window.innerHeight ) * 2 + 1;
+		
+	raycaster.setFromCamera(mouseCoordinates, camera);
+
+	let intersects = raycaster.intersectObjects(carousel.musicButtons);
+
+	if (intersects.length > 0){
+		let selectedMusic = intersects[0].object;
+		playMusic(selectedMusic.musicTrack);
+	}
+
 }
 
 function animate() {
@@ -269,6 +285,9 @@ function animate() {
 
 	zoomAnimationOut.animate(deltaTime);
 	zoomAnimationIn.animate(deltaTime);
+
+	selectedExhibit = carousel.planes[carousel.getCurrentObjectInViewIndex()];
+
 
 	if(!idle && isIdleState()) {
 		idle = true;
@@ -357,7 +376,6 @@ function animate() {
 	carousel.animate();
 	ui.animate(deltaTime);
 
-	let selectedExhibit = carousel.planes[carousel.getCurrentObjectInViewIndex()];
 	popUp.update(deltaTime, selectedExhibit);
 
 
@@ -379,6 +397,12 @@ function isIdleState() {
 
 function lerp(a, b, alpha){
 	return a + alpha * (b - a);
+}
+
+function playMusic(musicTrack){
+	carousel.sound.stop();
+	carousel.sound.changeMusicSource("sounds/" + musicTrack);
+	carousel.sound.play();
 }
 
 init()

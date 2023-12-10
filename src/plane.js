@@ -1,9 +1,11 @@
 import * as THREE from 'three';
 import { Text } from 'troika-three-text';
+import { getTextureLoader } from './loaders.js';
 
 class Plane {
 
   texturedPlane;
+  playPlane;
 
   emptyFlatPlane;
   emptyBentPlane;
@@ -11,6 +13,7 @@ class Plane {
   bentVertexPositions;
 
   geometry;
+  playGeometry;
   scene;
   currentAngleRadians = 0;
   currentAngle = 0;
@@ -24,7 +27,8 @@ class Plane {
   selected = false;
   fontSizeTitle = 0.018;
   fontSize = 0.012;
-  scale = 0.00035;
+  scale = 0.00015;
+  playScale = 0.0005;
   planeMaterial;
 
   extraclearanceForTallPhotos = 0;
@@ -46,11 +50,11 @@ class Plane {
   flatVertexPositions;
   flatVertexPositions;
 
-  constructor(exhibit, scene, angleInDegrees, height, tilt) {
+  constructor(exhibit, scene, angleInDegrees, height, musicButtons) {
     this.height = height;
     this.currentAngle = THREE.MathUtils.degToRad(angleInDegrees);
     this.currentAnglePlus180 = THREE.MathUtils.degToRad(angleInDegrees + 180);
-
+    
     this.scene = scene;
     if(exhibit.path.includes("chapter")){
       this.chapter = new Text();
@@ -64,7 +68,7 @@ class Plane {
       this.isChapter = true;
     }
     else{
-      let texture = new THREE.TextureLoader().load(exhibit.path, (texture) => {
+      getTextureLoader().load(exhibit.path, (texture) => {
 
         this.planeMaterial = new THREE.MeshBasicMaterial({
           map: texture,
@@ -121,6 +125,25 @@ class Plane {
 
         this.scene.add(this.texturedPlane);
         this.isLoaded = true;
+      });
+
+      this.promise = new Promise((resolve) => {
+        getTextureLoader().load("icons/teleportButton.png", (texture) => {
+
+          let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+      
+          const planeWidth = texture.image.naturalWidth * this.playScale;
+          const planeHeight = texture.image.naturalHeight * this.playScale * this.radius;
+      
+          //Textured Plane:
+          this.playGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
+          this.playGeometry.translate(0, this.height, 1);
+          this.playPlane = new THREE.Mesh(this.playGeometry, playMaterial);
+          this.playPlane.position.set(0,-0.3,0);
+          this.playPlane.musicTrack = exhibit.sound;
+          this.scene.add(this.playPlane);
+          musicButtons.push(this.playPlane);
+        });
       });
     }
 
@@ -216,6 +239,7 @@ setRadiusVeryFast(alpha) {
       this.texturedPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       //this.emptyFlatPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       //this.emptyFlatPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
+      this.playPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
 
       this.planeMaterial.opacity = opacity;
     }
@@ -287,6 +311,10 @@ setRadiusVeryFast(alpha) {
     this.isTitleVisible = true;
     this.dateTroika.material.opacity = 1;
     this.dateTroika.sync();
+  }
+
+  getPromise() {
+    return this.promise;
   }
 }
 
