@@ -31,9 +31,6 @@ class Plane {
   playScale = 0.0005;
   planeMaterial;
 
-  extraclearanceForTallPhotos = 0;
-
-
   titleGR;
   descriptionGR;
 
@@ -69,95 +66,178 @@ class Plane {
     }
     else{
       getTextureLoader().load(exhibit.path, (texture) => {
-
-        this.planeMaterial = new THREE.MeshBasicMaterial({
-          map: texture,
-          side: THREE.DoubleSide,
-          transparent: true,
-          alphaTest : 0.05,
-          blending: THREE.CustomBlending,
-          blendSrc: THREE.SrcAlphaFactor,
-          blendDst: THREE.OneMinusSrcAlphaFactor,
-          blendEquation: THREE.AddEquation
-        });
-    
-        const planeWidth = texture.image.naturalWidth * this.scale;
-        const planeHeight = texture.image.naturalHeight * this.scale * this.radius;
-
-        if(planeHeight > planeWidth){
-          this.extraclearanceForTallPhotos = 0.03;
-        } 
-
-        const widthSegments = 30;
-        const heightSegments = 30;
-    
-        //Textured Plane:
-        this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
-        this.geometry.translate(0, this.height, 1);
-        this.texturedPlane = new THREE.Mesh(this.geometry, this.planeMaterial);
-
-        //flat untextured plane:
-        this.flatGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
-        this.flatGeometry.translate(0, this.height, 1);
-        this.flatVertexPositions = this.flatGeometry.attributes.position.array;
-        this.emptyFlatPlane = new THREE.Mesh(this.flatGeometry, new THREE.MeshBasicMaterial());
-
-        //bent untextured plane:
-        this.bentGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
-        this.bentGeometry.translate(0, this.height, 1);
-        this.bentVertexPositions = this.bentGeometry.attributes.position.array;
-        this.emptyBentPlane = new THREE.Mesh(this.bentGeometry, new THREE.MeshBasicMaterial());
-
-        let newVertexPositions = [];
-      
-        for (let i = 0; i < this.bentVertexPositions.length; i += 3) {
-          let exhibit_x = this.bentVertexPositions[i];
-          let exhibit_y = this.bentVertexPositions[i + 1];
-          let exhibit_z = this.bentVertexPositions[i + 2];
-  
-          let xz = new THREE.Vector2(exhibit_x, exhibit_z).normalize().multiplyScalar(this.radius);
-          newVertexPositions.push(xz.x, exhibit_y, xz.y);
+        if (exhibit.path_back != ""){
+          getTextureLoader().load(exhibit.path_back, (texture_back) => {
+            this.createDoubleSidedPlaneWithTexture(texture, texture_back);
+          })
+        }else{
+          this.createPlaneWithTexture(texture);
         }
-
-        this.bentGeometry.setAttribute('position', new THREE.Float32BufferAttribute(newVertexPositions, 3));
-        this.bentGeometry.attributes.position.needsUpdate = true;
-        this.bentVertexPositions = this.bentGeometry.attributes.position.array;
-
-        this.scene.add(this.texturedPlane);
-        this.isLoaded = true;
       });
 
-      this.promise = new Promise((resolve) => {
+      this.promise = new Promise(() => {
         getTextureLoader().load("icons/teleportButton.png", (texture) => {
-
-          let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
-      
-          const planeWidth = texture.image.naturalWidth * this.playScale;
-          const planeHeight = texture.image.naturalHeight * this.playScale * this.radius;
-      
-          //Textured Plane:
-          this.playGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
-          this.playGeometry.translate(0, this.height, 1);
-          this.playPlane = new THREE.Mesh(this.playGeometry, playMaterial);
-          this.playPlane.position.set(0,-0.3,0);
-          this.playPlane.musicTrack = exhibit.sound;
-          this.scene.add(this.playPlane);
+          this.setupPlayPlane(texture, exhibit);
           musicButtons.push(this.playPlane);
         });
       });
     }
 
     //DATES TROIKA
+    this.setupTroikaDate(exhibit);
+
+    //DESCRIPTIONS
+    this.setupDescriptions(exhibit);
+  }
+
+  createPlaneWithTexture(texture){
+    this.planeMaterial = new THREE.MeshBasicMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+      transparent: true,
+      alphaTest : 0.05,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.SrcAlphaFactor,
+      blendDst: THREE.OneMinusSrcAlphaFactor,
+      blendEquation: THREE.AddEquation
+    });
+
+    const planeWidth = texture.image.naturalWidth * this.scale;
+    const planeHeight = texture.image.naturalHeight * this.scale * this.radius;
+
+    const widthSegments = 30;
+    const heightSegments = 30;
+
+    //Textured Plane:
+    this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
+    this.geometry.translate(0, this.height, 1);
+    this.texturedPlane = new THREE.Mesh(this.geometry, this.planeMaterial);
+
+    //flat untextured plane:
+    this.flatGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
+    this.flatGeometry.translate(0, this.height, 1);
+    this.flatVertexPositions = this.flatGeometry.attributes.position.array;
+    this.emptyFlatPlane = new THREE.Mesh(this.flatGeometry, new THREE.MeshBasicMaterial());
+
+    //bent untextured plane:
+    this.bentGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
+    this.bentGeometry.translate(0, this.height, 1);
+    this.bentVertexPositions = this.bentGeometry.attributes.position.array;
+    this.emptyBentPlane = new THREE.Mesh(this.bentGeometry, new THREE.MeshBasicMaterial());
+
+    let newVertexPositions = [];
+  
+    for (let i = 0; i < this.bentVertexPositions.length; i += 3) {
+      let exhibit_x = this.bentVertexPositions[i];
+      let exhibit_y = this.bentVertexPositions[i + 1];
+      let exhibit_z = this.bentVertexPositions[i + 2];
+
+      let xz = new THREE.Vector2(exhibit_x, exhibit_z).normalize().multiplyScalar(this.radius);
+      newVertexPositions.push(xz.x, exhibit_y, xz.y);
+    }
+
+    this.bentGeometry.setAttribute('position', new THREE.Float32BufferAttribute(newVertexPositions, 3));
+    this.bentGeometry.attributes.position.needsUpdate = true;
+    this.bentVertexPositions = this.bentGeometry.attributes.position.array;
+
+    this.scene.add(this.texturedPlane);
+    this.isLoaded = true;
+  }
+
+  createDoubleSidedPlaneWithTexture(frontTexture, backTexture){
+    // Material for the front face
+    this.planeMaterial = new THREE.MeshBasicMaterial({
+      map: frontTexture,
+      side: THREE.FrontSide,
+      alphaTest: 0.05,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.SrcAlphaFactor,
+      blendDst: THREE.OneMinusSrcAlphaFactor,
+      blendEquation: THREE.AddEquation
+    });
+
+    // Material for the back face
+    const backMaterial = new THREE.MeshBasicMaterial({
+      map: backTexture,
+      side: THREE.BackSide,
+      alphaTest: 0.05,
+      blending: THREE.CustomBlending,
+      blendSrc: THREE.SrcAlphaFactor,
+      blendDst: THREE.OneMinusSrcAlphaFactor,
+      blendEquation: THREE.AddEquation
+    });
+
+    const planeWidth = frontTexture.image.naturalWidth * this.scale;
+    const planeHeight = frontTexture.image.naturalHeight * this.scale * this.radius;
+
+    const widthSegments = 30;
+    const heightSegments = 30;
+
+    //Textured Plane:
+    this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
+    this.geometry.translate(0, this.height, 1);
+    this.texturedPlane = new THREE.Mesh(this.geometry, [this.planeMaterial, backMaterial]);
+
+    //flat untextured plane:
+    this.flatGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
+    this.flatGeometry.translate(0, this.height, 1);
+    this.flatVertexPositions = this.flatGeometry.attributes.position.array;
+    this.emptyFlatPlane = new THREE.Mesh(this.flatGeometry, new THREE.MeshBasicMaterial());
+
+    //bent untextured plane:
+    this.bentGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
+    this.bentGeometry.translate(0, this.height, 1);
+    this.bentVertexPositions = this.bentGeometry.attributes.position.array;
+    this.emptyBentPlane = new THREE.Mesh(this.bentGeometry, new THREE.MeshBasicMaterial());
+
+    let newVertexPositions = [];
+  
+    for (let i = 0; i < this.bentVertexPositions.length; i += 3) {
+      let exhibit_x = this.bentVertexPositions[i];
+      let exhibit_y = this.bentVertexPositions[i + 1];
+      let exhibit_z = this.bentVertexPositions[i + 2];
+
+      let xz = new THREE.Vector2(exhibit_x, exhibit_z).normalize().multiplyScalar(this.radius);
+      newVertexPositions.push(xz.x, exhibit_y, xz.y);
+    }
+
+    this.bentGeometry.setAttribute('position', new THREE.Float32BufferAttribute(newVertexPositions, 3));
+    this.bentGeometry.attributes.position.needsUpdate = true;
+    this.bentVertexPositions = this.bentGeometry.attributes.position.array;
+
+    this.scene.add(this.texturedPlane);
+    this.isLoaded = true;
+  }
+
+
+
+  setupPlayPlane(texture, exhibit) {
+    const playMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, opacity: 1 });
+
+    const planeWidth = texture.image.naturalWidth * this.playScale;
+    const planeHeight = texture.image.naturalHeight * this.playScale * this.radius;
+
+    // Play Plane:
+    this.playGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
+    this.playGeometry.translate(0, this.height, 1);
+    this.playPlane = new THREE.Mesh(this.playGeometry, playMaterial);
+    this.playPlane.position.set(0, -0.3, 0);
+    this.playPlane.musicTrack = exhibit.sound;
+    this.scene.add(this.playPlane);
+  }
+
+  setupTroikaDate(exhibit) {
     this.dateTroika = new Text();
     this.dateTroika.text = exhibit.titleGR;
     this.dateTroika.font = 'fonts/GFSDidot-Regular.ttf';
     this.dateTroika.fontSize = this.fontSizeTitle;
     this.dateTroika.maxWidth = 0.3;
-    this.dateTroika.color = "#9b722f"
+    this.dateTroika.color = "#9b722f";
     this.dateTroika.sync();
-    scene.add(this.dateTroika);
+    this.scene.add(this.dateTroika);
+  }
 
-    //DESCRIPTIONS
+  setupDescriptions(exhibit) {
     this.titleGR = exhibit.titleGR;
     this.descriptionGR = exhibit.descriptionGR;
 
@@ -271,7 +351,7 @@ setRadiusVeryFast(alpha) {
 
     this.dateTroika.position.set(-textWidth / 2, 0, 0);
     this.dateTroika.translateOnAxis(currentPositionVector, this.radius);
-    this.dateTroika.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height - this.dateOffset + this.extraclearanceForTallPhotos)
+    this.dateTroika.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height - this.dateOffset)
     this.dateTroika.sync();
   }
 
@@ -315,6 +395,12 @@ setRadiusVeryFast(alpha) {
 
   getPromise() {
     return this.promise;
+  }
+
+  flip() {
+    if (this.isLoaded && this.texturedPlane) {
+      this.texturedPlane.rotation.y += Math.PI;
+    }
   }
 }
 
