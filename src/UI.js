@@ -99,7 +99,7 @@ class UI{
     createtitle(title){
         this.troikaTitle = new Text();
         this.troikaTitle.text = title;
-        this.troikaTitle.font = 'fonts/GFSDidot-Regular.ttf';
+        this.troikaTitle.font = 'fonts/jura/Jura-Regular.ttf';
         this.troikaTitle.color = "#ffffff";
         this.troikaTitle.material.opacity = 1;
         this.troikaTitle.fontSize = 0.032;

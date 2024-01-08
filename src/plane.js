@@ -59,7 +59,7 @@ class Plane {
     if(exhibit.path.includes("chapter")){
       this.chapter = new Text();
       this.chapter.text = exhibit.descriptionGR;
-      this.chapter.font = 'fonts/GFSDidot-Regular.ttf';
+      this.chapter.font = 'fonts/jura/Jura-Regular.ttf';
       this.chapter.fontSize = this.fontSize;
       this.chapter.maxWidth = 0.30;
       this.chapter.sync();
@@ -150,10 +150,10 @@ class Plane {
     //DATES TROIKA
     this.dateTroika = new Text();
     this.dateTroika.text = exhibit.titleGR;
-    this.dateTroika.font = 'fonts/GFSDidot-Regular.ttf';
+    this.dateTroika.font = 'fonts/jura/Jura-Regular.ttf';
     this.dateTroika.fontSize = this.fontSizeTitle;
     this.dateTroika.maxWidth = 0.3;
-    this.dateTroika.color = "#9b722f"
+    this.dateTroika.color = "#ffffff"
     this.dateTroika.sync();
     scene.add(this.dateTroika);
 
