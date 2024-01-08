@@ -112,6 +112,7 @@ class Plane {
     this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
     this.geometry.translate(0, this.height, 1);
     this.texturedPlane = new THREE.Mesh(this.geometry, this.planeMaterial);
+    this.texturedPlane.internalType = "vinyl";
 
     //flat untextured plane:
     this.flatGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
@@ -176,7 +177,15 @@ class Plane {
     //Textured Plane:
     this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
     this.geometry.translate(0, this.height, 1);
-    this.texturedPlane = new THREE.Mesh(this.geometry, [this.planeMaterial, backMaterial]);
+    // Create two separate meshes with different materials
+    const frontMesh = new THREE.Mesh(this.geometry, this.planeMaterial);
+    const backMesh = new THREE.Mesh(this.geometry, backMaterial);
+
+    // Create a group and add both meshes to the group
+    this.texturedPlane = new THREE.Group();
+    this.texturedPlane.add(frontMesh);
+    this.texturedPlane.add(backMesh);
+    this.texturedPlane.internalType = "vinyl";
 
     //flat untextured plane:
     this.flatGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
@@ -223,6 +232,8 @@ class Plane {
     this.playPlane = new THREE.Mesh(this.playGeometry, playMaterial);
     this.playPlane.position.set(0, -0.3, 0);
     this.playPlane.musicTrack = exhibit.sound;
+    this.playPlane.internalType = "playButton";
+
     this.scene.add(this.playPlane);
   }
 
@@ -397,9 +408,11 @@ setRadiusVeryFast(alpha) {
     return this.promise;
   }
 
-  flip() {
+  flip(alpha) {
     if (this.isLoaded && this.texturedPlane) {
-      this.texturedPlane.rotation.y += Math.PI;
+      const targetRotation = Math.PI;
+      const newRotation = THREE.MathUtils.lerp(0, targetRotation, alpha);
+      this.texturedPlane.rotation.y = newRotation;
     }
   }
 }

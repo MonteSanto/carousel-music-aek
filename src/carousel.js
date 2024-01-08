@@ -19,6 +19,7 @@ class Carousel{
     sound;
     planesPromise;
     musicButtons = [];
+    planeMeshes = [];
 
     constructor(scene, imagesPerRevolution = 12, spiraleThreadHeight = 0){
         this.imagesPerRevolution = imagesPerRevolution;
@@ -38,6 +39,7 @@ class Carousel{
         });
 
         this.getMusicButtons();
+        this.getPlaneMeshes();
     }
 
     getAngularDistanceToCloserObjectNormalized(){
@@ -135,6 +137,14 @@ class Carousel{
         this.planesPromise.then(() => {
             this.planes.forEach(plane => {
                 this.musicButtons.push(plane.playPlane);
+            })
+        });
+    }
+
+    getPlaneMeshes(){
+        this.planesPromise.then(() => {
+            this.planes.forEach(plane => {
+                this.planeMeshes.push(plane.texturedPlane);
             })
         });
     }

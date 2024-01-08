@@ -43,6 +43,7 @@ let selectedPlane = {current: 5, onClick: function() {goToStart=true; popUp.clos
 
 let zoomAnimationOut;
 let zoomAnimationIn;
+let rotateVinylAnimation;
 
 let goToStart = false;
 
@@ -222,6 +223,10 @@ function init(){
 		ui.setStartButtonOpacity(alpha);
 	})
 
+	rotateVinylAnimation = new Animation(0.5, (alpha) => {
+		selectedExhibit.flip(alpha);
+	})
+
 	//BACKGROUND LOGO
 	getTextureLoader().load( './images/logoTransparent.png', (texture) => {
 
@@ -266,11 +271,15 @@ function onClick(event) {
 		
 	raycaster.setFromCamera(mouseCoordinates, camera);
 
-	let intersects = raycaster.intersectObjects(carousel.musicButtons);
+	let intersects = raycaster.intersectObjects(carousel.musicButtons.concat(carousel.planeMeshes));
 
 	if (intersects.length > 0){
-		let selectedMusic = intersects[0].object;
-		playMusic(selectedMusic.musicTrack);
+		let selectedObject = intersects[0].object;
+		if(selectedObject.internalType == 'playButton'){
+			playMusic(selectedMusic.musicTrack);
+		}else if(selectedObject.internalType == 'viny'){
+			rotateVinylAnimation.play();
+		}
 	}
 
 }
@@ -285,6 +294,7 @@ function animate() {
 
 	zoomAnimationOut.animate(deltaTime);
 	zoomAnimationIn.animate(deltaTime);
+	rotateVinylAnimation.animate(deltaTime);
 
 	selectedExhibit = carousel.planes[carousel.getCurrentObjectInViewIndex()];
 
