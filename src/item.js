@@ -106,7 +106,7 @@ class Item {
         group.add(this.text);
 
         this.text.text = this.name.GR;
-        this.text.font = 'fonts/GFSDidot-Regular.ttf';
+        this.text.font = 'fonts/jura/Jura-Regular.ttf';
         this.text.fontSize = 0.022 * this.scaling;
         this.text.anchorY = 'middle'
         this.text.maxWidth = 1000;

@@ -9,12 +9,12 @@
 	z-index: 100;
 	display:block;
   background-color: black;
-  font-family: 'didot';
+  font-family: 'jura';
 }
 
 @font-face {
-  font-family: 'didot';
-  src:  url('fonts/GFSDidot-Regular.ttf');
+  font-family: 'jura';
+  src:  url('fonts/jura/Jura-Regular.ttf');
   font-weight: 100;
   font-style: normal;
   font-display: block;
@@ -36,7 +36,7 @@ html, body {
   margin:0;
   padding:0;
   background-color: black;
-  font-family: 'didot';
+  font-family: 'jura';
 }
 
 p {
@@ -57,7 +57,7 @@ p {
 #popup-exhibit-description::-webkit-scrollbar-thumb
 {
   border-radius: 10px;
-  background-color: #9b722f;
+  background-color: #ebc334;
 }
 
 
@@ -68,13 +68,13 @@ p {
   width: calc(100vw);
   height: calc(100vh/2.7);
   background: #000000;
-  border-top: 0.20vw solid #9b722f;
+  border-top: 0.20vw solid #ebc334;
   box-sizing:border-box;
   z-index:2;
   text-align: left;
   opacity:1;
   color:white;
-  font-family: 'didot';
+  font-family: 'jura';
 }
 
 .element-exhibit{

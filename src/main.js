@@ -83,7 +83,7 @@ function init(){
 
 	//SKY DOME
 	skyDomeScene = new THREE.Scene();
-	const highlightColor = new THREE.Color('#9b722f');
+	const highlightColor = new THREE.Color('#ebc334');
 
 	let skyDomeRadius = 10.01;
 	skyMaterial = new THREE.ShaderMaterial({
