@@ -28,7 +28,7 @@ class Plane {
   fontSizeTitle = 0.018;
   fontSize = 0.012;
   scale = 0.00015;
-  playScale = 0.0005;
+  playScale = 0.00015;
   planeMaterial;
 
   extraclearanceForTallPhotos = 0;
@@ -128,7 +128,7 @@ class Plane {
       });
 
       this.promise = new Promise((resolve) => {
-        getTextureLoader().load("icons/teleportButton.png", (texture) => {
+        getTextureLoader().load("icons/play.png", (texture) => {
 
           let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
       
@@ -139,7 +139,7 @@ class Plane {
           this.playGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
           this.playGeometry.translate(0, this.height, 1);
           this.playPlane = new THREE.Mesh(this.playGeometry, playMaterial);
-          this.playPlane.position.set(0,-0.3,0);
+          this.playPlane.position.set(0,-0.22,0);
           this.playPlane.musicTrack = exhibit.sound;
           this.scene.add(this.playPlane);
           musicButtons.push(this.playPlane);
