@@ -50,6 +50,9 @@ let selectedExhibit;
 
 let isMusicPaused = false;
 
+let playMaterial = null;
+let pauseMaterial = null;
+
 function init(){
 	raycaster = new THREE.Raycaster();
 	raycaster.far = 0.8;
@@ -405,21 +408,33 @@ function lerp(a, b, alpha){
 }
 
 function handleMusicPlayerButton(selectedObject){
+	console.log("click button play/pause");
 	if(selectedObject.buttonIcon=="pause"){
 		carousel.sound.pause();
-		getTextureLoader().load("icons/play.png", (texture) => {
-			let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+		if(playMaterial == null){
+			getTextureLoader().load("icons/play.png", (texture) => {
+				playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+				selectedObject.material = playMaterial;
+				selectedObject.buttonIcon = "play";
+			  });
+		}else{
 			selectedObject.material = playMaterial;
 			selectedObject.buttonIcon = "play";
-		  });
+		}
+
 		isMusicPaused = true;
 	}else{
 		playMusic(selectedObject.musicTrack);
-		getTextureLoader().load("icons/pause.png", (texture) => {
-			let pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+		if(pauseMaterial == null){
+			getTextureLoader().load("icons/pause.png", (texture) => {
+				pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+				selectedObject.material = pauseMaterial;
+				selectedObject.buttonIcon = "pause";
+			  });
+		}else{
 			selectedObject.material = pauseMaterial;
 			selectedObject.buttonIcon = "pause";
-		  });
+		}
 		  isMusicPaused = false;
 	}
 }
