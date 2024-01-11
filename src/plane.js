@@ -130,7 +130,16 @@ class Plane {
       this.promise = new Promise((resolve) => {
         getTextureLoader().load("icons/play.png", (texture) => {
 
-          let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+          let playMaterial = new THREE.MeshBasicMaterial({
+            map: texture,
+            transparent: true,
+            opacity: 1,
+            alphaTest : 0.05,
+            blending: THREE.CustomBlending,
+            blendSrc: THREE.SrcAlphaFactor,
+            blendDst: THREE.OneMinusSrcAlphaFactor,
+            blendEquation: THREE.AddEquation
+            });
       
           const planeWidth = texture.image.naturalWidth * this.playScale;
           const planeHeight = texture.image.naturalHeight * this.playScale * this.radius;

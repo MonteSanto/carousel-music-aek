@@ -30,7 +30,7 @@ let firstTouchId = null;
 
 let idle = false;
 
-let secondsToIdle = 6;
+let secondsToIdle = 60;
 let idleTime = secondsToIdle; // starting the app in idle mode
 let maxidleTimePause = 4
 let idleTimePause = 0;
@@ -168,7 +168,7 @@ function init(){
 
 	document.addEventListener('pointerdown', (event) => {
 		goToStart = false;
-		onClick(event);
+		//onClick(event);
 
 		idleTime = 0;
 		if(idle){
