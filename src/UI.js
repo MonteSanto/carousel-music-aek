@@ -46,7 +46,7 @@ class UI{
         this.start = new Button('START2', true, 'topCenter', spacing, buttonsYOffset, size * 1.6, this.sceneOrtho, this.cameraOrtho);
         this.setStartButtonOpacity(0);
 
-        this.createtitle("Music");
+        this.createtitle("ΥΜΝΟΙ ΤΗΣ ΑΕΚ");
         this.sceneOrtho.add(this.troikaTitle);
 
         this.createBackground(0x9b722f);

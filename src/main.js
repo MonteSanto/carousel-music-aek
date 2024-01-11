@@ -48,6 +48,8 @@ let goToStart = false;
 
 let selectedExhibit;
 
+let isMusicPaused = false;
+
 function init(){
 	raycaster = new THREE.Raycaster();
 	raycaster.far = 0.8;
@@ -136,6 +138,7 @@ function init(){
                 idle = false;
                 currentMouseX = touch.clientX
                 ui.onOrthographicMouseMove();
+				stopMusic();
             }
         }
     }, false);
@@ -186,6 +189,7 @@ function init(){
 		isMouseDown = false
 		previousMouseX = null;
 		currentMouseX = null;
+		stopMusic();
 	});
 
 	window.addEventListener( 'resize', onWindowResize, false );
@@ -210,6 +214,7 @@ function init(){
 		ui.setTitleOpacity(alpha);
 		ui.setStartButtonOpacity(1-alpha);
     	selectedPlane.current = 5;
+		carousel.sound.stop();
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
@@ -270,7 +275,7 @@ function onClick(event) {
 
 	if (intersects.length > 0){
 		let selectedMusic = intersects[0].object;
-		playMusic(selectedMusic.musicTrack);
+		handleMusicPlayerButton(selectedMusic);
 	}
 
 }
@@ -399,10 +404,39 @@ function lerp(a, b, alpha){
 	return a + alpha * (b - a);
 }
 
+function handleMusicPlayerButton(selectedObject){
+	if(selectedObject.buttonIcon=="pause"){
+		carousel.sound.pause();
+		getTextureLoader().load("icons/play.png", (texture) => {
+			let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+			selectedObject.material = playMaterial;
+			selectedObject.buttonIcon = "play";
+		  });
+		isMusicPaused = true;
+	}else{
+		playMusic(selectedObject.musicTrack);
+		getTextureLoader().load("icons/pause.png", (texture) => {
+			let pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+			selectedObject.material = pauseMaterial;
+			selectedObject.buttonIcon = "pause";
+		  });
+		  isMusicPaused = false;
+	}
+}
+
 function playMusic(musicTrack){
+	if(isMusicPaused){
+		carousel.sound.play();
+	}else{
+		carousel.sound.stop();
+		carousel.sound.changeMusicSource("sounds/" + musicTrack);
+		carousel.sound.play();
+	}
+}
+
+function stopMusic(){
+	isMusicPaused = false;
 	carousel.sound.stop();
-	carousel.sound.changeMusicSource("sounds/" + musicTrack);
-	carousel.sound.play();
 }
 
 init()

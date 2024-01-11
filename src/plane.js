@@ -141,6 +141,7 @@ class Plane {
           this.playPlane = new THREE.Mesh(this.playGeometry, playMaterial);
           this.playPlane.position.set(0,-0.22,0);
           this.playPlane.musicTrack = exhibit.sound;
+          this.playPlane.buttonIcon = "play";
           this.scene.add(this.playPlane);
           musicButtons.push(this.playPlane);
         });
@@ -315,6 +316,22 @@ setRadiusVeryFast(alpha) {
 
   getPromise() {
     return this.promise;
+  }
+
+  changeToPlaybutton(){
+    getTextureLoader().load("icons/play.png", (texture) => {
+      let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+      this.playPlane.material = playMaterial;
+      this.playPlane.buttonIcon = "play";
+    });
+  }
+
+  changeToPauseButton(){
+    getTextureLoader().load("icons/pause.png", (texture) => {
+      let pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+      this.playPlane.material = pauseMaterial;
+      this.playPlane.buttonIcon = "pause";
+    });
   }
 }
 
