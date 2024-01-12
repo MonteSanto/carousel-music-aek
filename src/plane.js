@@ -30,14 +30,15 @@ class Plane {
   scale = 0.00015;
   playScale = 0.00015;
   planeMaterial;
+  playMaterial;
+  buttonOpacity = 0;
 
-  extraclearanceForTallPhotos = 0;
+  parentPlane;
 
+  test = 0;
 
   titleGR;
   descriptionGR;
-
-  test = 0;
 
   titleEN;
   descriptionEN;
@@ -84,10 +85,6 @@ class Plane {
         const planeWidth = texture.image.naturalWidth * this.scale;
         const planeHeight = texture.image.naturalHeight * this.scale * this.radius;
 
-        if(planeHeight > planeWidth){
-          this.extraclearanceForTallPhotos = 0.03;
-        } 
-
         const widthSegments = 30;
         const heightSegments = 30;
     
@@ -96,33 +93,6 @@ class Plane {
         this.geometry.translate(0, this.height, 1);
         this.texturedPlane = new THREE.Mesh(this.geometry, this.planeMaterial);
 
-        //flat untextured plane:
-        this.flatGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
-        this.flatGeometry.translate(0, this.height, 1);
-        this.flatVertexPositions = this.flatGeometry.attributes.position.array;
-        this.emptyFlatPlane = new THREE.Mesh(this.flatGeometry, new THREE.MeshBasicMaterial());
-
-        //bent untextured plane:
-        this.bentGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
-        this.bentGeometry.translate(0, this.height, 1);
-        this.bentVertexPositions = this.bentGeometry.attributes.position.array;
-        this.emptyBentPlane = new THREE.Mesh(this.bentGeometry, new THREE.MeshBasicMaterial());
-
-        let newVertexPositions = [];
-      
-        for (let i = 0; i < this.bentVertexPositions.length; i += 3) {
-          let exhibit_x = this.bentVertexPositions[i];
-          let exhibit_y = this.bentVertexPositions[i + 1];
-          let exhibit_z = this.bentVertexPositions[i + 2];
-  
-          let xz = new THREE.Vector2(exhibit_x, exhibit_z).normalize().multiplyScalar(this.radius);
-          newVertexPositions.push(xz.x, exhibit_y, xz.y);
-        }
-
-        this.bentGeometry.setAttribute('position', new THREE.Float32BufferAttribute(newVertexPositions, 3));
-        this.bentGeometry.attributes.position.needsUpdate = true;
-        this.bentVertexPositions = this.bentGeometry.attributes.position.array;
-
         this.scene.add(this.texturedPlane);
         this.isLoaded = true;
       });
@@ -130,15 +100,15 @@ class Plane {
       this.promise = new Promise((resolve) => {
         getTextureLoader().load("icons/play.png", (texture) => {
 
-          let playMaterial = new THREE.MeshBasicMaterial({
-            map: texture,
-            transparent: true,
-            opacity: 1,
-            alphaTest : 0.05,
-            blending: THREE.CustomBlending,
-            blendSrc: THREE.SrcAlphaFactor,
-            blendDst: THREE.OneMinusSrcAlphaFactor,
-            blendEquation: THREE.AddEquation
+          this.playMaterial = new THREE.MeshBasicMaterial({
+              map: texture,
+              transparent: true,
+              opacity: this.buttonOpacity,
+              alphaTest : 0.05,
+              blending: THREE.CustomBlending,
+              blendSrc: THREE.SrcAlphaFactor,
+              blendDst: THREE.OneMinusSrcAlphaFactor,
+              blendEquation: THREE.AddEquation
             });
       
           const planeWidth = texture.image.naturalWidth * this.playScale;
@@ -147,7 +117,7 @@ class Plane {
           //Textured Plane:
           this.playGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
           this.playGeometry.translate(0, this.height, 1);
-          this.playPlane = new THREE.Mesh(this.playGeometry, playMaterial);
+          this.playPlane = new THREE.Mesh(this.playGeometry, this.playMaterial);
           this.playPlane.position.set(0,-0.22,0);
           this.playPlane.musicTrack = exhibit.sound;
           this.playPlane.buttonIcon = "play";
@@ -175,83 +145,26 @@ class Plane {
     this.descriptionEN = exhibit.descriptionEN;
   }
 
-  setRadiusSlow(alpha){
-    if(this.isLoaded){
-        let newVertexPositions = [];
-  
-        for (let i = 0; i < this.flatVertexPositions.length; i += 3) {
-            
-          let fx = this.flatVertexPositions[i];
-          let fy = this.flatVertexPositions[i + 1];
-          let fz = this.flatVertexPositions[i + 2];
-
-          let bx = this.bentVertexPositions[i];
-          let by = this.bentVertexPositions[i + 1];
-          let bz = this.bentVertexPositions[i + 2];
-  
-          let flatVertex = new THREE.Vector3(fx, fy, fz);
-          let bendVertex = new THREE.Vector3(bx, by, bz);
-
-          let inbetweenVertex = flatVertex.lerp(bendVertex, alpha);
-
-          newVertexPositions.push(inbetweenVertex.x, inbetweenVertex.y, inbetweenVertex.z);
-        }
-  
-        this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(newVertexPositions, 3));
-      }
-  }
-
-  setRadiusFast(alpha) {
-  if (this.isLoaded) {
-    const vertexLength = this.flatVertexPositions.length;
-    const newVertexPositions = new Float32Array(vertexLength);
-
-    for (let i = 0; i < vertexLength; i += 3) {
-      // lerp
-      newVertexPositions[i] = this.flatVertexPositions[i] + alpha * (this.bentVertexPositions[i] - this.flatVertexPositions[i]);
-      newVertexPositions[i + 1] = this.flatVertexPositions[i + 1] + alpha * (this.bentVertexPositions[i + 1] - this.flatVertexPositions[i + 1]);
-      newVertexPositions[i + 2] = this.flatVertexPositions[i + 2] + alpha * (this.bentVertexPositions[i + 2] - this.flatVertexPositions[i + 2]);
-    }
-
-    this.geometry.setAttribute('position', new THREE.Float32BufferAttribute(newVertexPositions, 3));
-  }
-}
-
-setRadiusVeryFast(alpha) {
-  if (this.isLoaded) {
-    const size = this.flatVertexPositions.length;
-    const geometryBuffer = this.geometry.getAttribute('position').array;
-
-    let fPos, bPos;
-    for (let i = 0; i < size; i += 3) {
-      fPos = i; bPos = i;
-      geometryBuffer[fPos] = this.flatVertexPositions[fPos] + alpha * (this.bentVertexPositions[bPos] - this.flatVertexPositions[fPos]);
-      geometryBuffer[fPos + 1] = this.flatVertexPositions[fPos + 1] + alpha * (this.bentVertexPositions[bPos + 1] - this.flatVertexPositions[fPos + 1]);
-      geometryBuffer[fPos + 2] = this.flatVertexPositions[fPos + 2] + alpha * (this.bentVertexPositions[bPos + 2] - this.flatVertexPositions[fPos + 2]);
-    }
-
-    this.geometry.attributes.position.needsUpdate = true;
-  }
-}
-
-
   setAngle(angleDegrees){
     this.currentAngle = this.currentAngle + THREE.MathUtils.degToRad(angleDegrees);
   }
 
   animate(){
-
     const currentPositionVector = new THREE.Vector3(Math.sin(this.currentAngle), 0, Math.cos(this.currentAngle));
     const distance = new THREE.Vector3(0, 0, 1).distanceTo(currentPositionVector);
     let opacity = 1 - ( 1 / (1 + Math.exp(-6.3 * (distance - 1.1))) ) ;
 
     if(this.isLoaded){
+      this.test += 0.01;
+      this.texturedPlane.rotateOnAxis(currentPositionVector.normalize(), this.test);
+
       this.texturedPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       //this.emptyFlatPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       //this.emptyFlatPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       this.playPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
 
       this.planeMaterial.opacity = opacity;
+
     }
 
     if(this.chapter){
@@ -281,7 +194,7 @@ setRadiusVeryFast(alpha) {
 
     this.dateTroika.position.set(-textWidth / 2, 0, 0);
     this.dateTroika.translateOnAxis(currentPositionVector, this.radius);
-    this.dateTroika.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height - this.dateOffset + this.extraclearanceForTallPhotos)
+    this.dateTroika.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height - this.dateOffset)
     this.dateTroika.sync();
   }
 
@@ -327,9 +240,19 @@ setRadiusVeryFast(alpha) {
     return this.promise;
   }
 
+  showPlayButton(){
+    this.buttonOpacity = 1;
+    if(this.playMaterial) this.playMaterial.opacity = this.buttonOpacity;
+  }
+
+  hidePlayButton(){
+    this.buttonOpacity = 0;
+    if(this.playMaterial) this.playMaterial.opacity = this.buttonOpacity;
+  }
+
   changeToPlaybutton(){
     getTextureLoader().load("icons/play.png", (texture) => {
-      let playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+      this.playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: this.buttonOpacity});
       this.playPlane.material = playMaterial;
       this.playPlane.buttonIcon = "play";
     });
@@ -337,7 +260,7 @@ setRadiusVeryFast(alpha) {
 
   changeToPauseButton(){
     getTextureLoader().load("icons/pause.png", (texture) => {
-      let pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+      let pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: this.buttonOpacity});
       this.playPlane.material = pauseMaterial;
       this.playPlane.buttonIcon = "pause";
     });

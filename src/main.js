@@ -212,7 +212,6 @@ function init(){
 		camera.position.z = lerp(cameraDefaultZ, cameraMaxZ, alpha);
 		carousel.planes.forEach(plane => {
 			plane.setOpacity(1-alpha);
-        	plane.setRadiusVeryFast(alpha);
     	})
 		ui.setTitleOpacity(alpha);
 		ui.setStartButtonOpacity(1-alpha);
@@ -224,7 +223,6 @@ function init(){
 		camera.position.z = lerp(cameraMaxZ, cameraDefaultZ, alpha);
 		carousel.planes.forEach(plane => {
 			plane.setOpacity(alpha);
-			plane.setRadiusVeryFast(1-alpha);
     	})
 		ui.setTitleOpacity(1-alpha);
 		ui.setStartButtonOpacity(alpha);
@@ -385,7 +383,7 @@ function animate() {
 	ui.animate(deltaTime);
 
 	popUp.update(deltaTime, selectedExhibit);
-
+	carousel.showPlayButtonOfCurrentObject();
 
 	renderer.clear();
 	renderer.render(skyDomeScene, camera);

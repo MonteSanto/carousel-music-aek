@@ -131,6 +131,14 @@ class Carousel{
         }
     }
 
+    showPlayButtonOfCurrentObject(){
+        for (let i = 0; i < this.planes.length; i++){
+            if(i == this.getCurrentObjectInViewIndex())
+                this.planes[i].showPlayButton();
+            else this.planes[i].hidePlayButton();
+        }
+    }
+
     getMusicButtons(){
         this.planesPromise.then(() => {
             this.planes.forEach(plane => {

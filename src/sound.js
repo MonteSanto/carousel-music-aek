@@ -16,6 +16,7 @@ class Sound{
             loop: loop,
             onplay: function() {
                 console.log('Audio is playing');
+                
                 var progressInterval = setInterval(function() {
                     var progress = (self.sound.seek() / self.sound.duration());
     
