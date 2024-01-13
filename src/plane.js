@@ -148,7 +148,7 @@ class Plane {
 
     if(this.texturedPlane){
       this.test += 0.001;
-      this.texturedPlane.rotateZ(0.01);
+      this.texturedPlane.rotateZ(-0.01);
 
 
       this.motherPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);

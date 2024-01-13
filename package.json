@@ -1,7 +1,37 @@
 {
+  "name": "carouselMusicAEK",
+  "version": "1.0.0",
+  "description": "Your App Description Here",
+  "main": "main.js",
   "dependencies": {
-    "@electron-forge/cli": "^7.2.0",
+    "electron-squirrel-startup": "^1.0.0",
     "three": "^0.151.3",
     "troika-three-text": "^0.49.0"
-  }
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.2.0",
+    "@electron-forge/maker-deb": "^6.2.1",
+    "@electron-forge/maker-rpm": "^6.2.1",
+    "@electron-forge/maker-squirrel": "^6.2.1",
+    "@electron-forge/maker-zip": "^6.2.1",
+    "electron": "^25.3.1"
+  },
+  "scripts": {
+    "start": "electron-forge start --inspect-electron",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MonteSanto/carousel-music-aek"
+  },
+  "keywords": [
+    "prosfigiko"
+  ],
+  "author": "Foivos Papageorgiou, Alexis Monte-Santo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SirNabla/prosfigikoApp/issues"
+  },
+  "homepage": "https://github.com/SirNabla/prosfigikoApp#readme"
 }
