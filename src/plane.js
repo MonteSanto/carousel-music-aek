@@ -3,14 +3,8 @@ import { Text } from 'troika-three-text';
 import { getTextureLoader } from './loaders.js';
 
 class Plane {
-
   texturedPlane;
   playPlane;
-
-  emptyFlatPlane;
-  emptyBentPlane;
-
-  bentVertexPositions;
 
   geometry;
   playGeometry;
@@ -19,12 +13,10 @@ class Plane {
   currentAngle = 0;
   currentAnglePlus180 = 0
   yVector = new THREE.Vector3(0, 1, 0);
-  sphere;
   height;
   dateOffset = -0.2;
   dateTroika;
   radius = 1;
-  selected = false;
   fontSizeTitle = 0.018;
   fontSize = 0.012;
   scale = 0.00015;
@@ -33,7 +25,8 @@ class Plane {
   playMaterial;
   buttonOpacity = 0;
 
-  parentPlane;
+  fatherPlane;
+  motherPlane;
 
   test = 0;
 
@@ -42,14 +35,10 @@ class Plane {
 
   titleEN;
   descriptionEN;
-  isLoaded = false;
   chapter;
   isChapter = false;
   isTitleVisible = true;
   maxOpacity = 1;
-
-  flatVertexPositions;
-  flatVertexPositions;
 
   constructor(exhibit, scene, angleInDegrees, height, musicButtons) {
     this.height = height;
@@ -84,17 +73,20 @@ class Plane {
     
         const planeWidth = texture.image.naturalWidth * this.scale;
         const planeHeight = texture.image.naturalHeight * this.scale * this.radius;
-
-        const widthSegments = 30;
-        const heightSegments = 30;
     
-        //Textured Plane:
-        this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight, widthSegments, heightSegments);
-        this.geometry.translate(0, this.height, 1);
+        this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
+        //this.geometry.translate(0, this.height, 1);
         this.texturedPlane = new THREE.Mesh(this.geometry, this.planeMaterial);
 
-        this.scene.add(this.texturedPlane);
-        this.isLoaded = true;
+        this.fatherPlane = new THREE.Object3D();
+        this.fatherPlane.add(this.texturedPlane);
+        this.fatherPlane.translateY(this.height);
+        this.fatherPlane.translateZ(1);
+
+        this.motherPlane = new THREE.Object3D();
+        this.motherPlane.add(this.fatherPlane); 
+
+        this.scene.add(this.motherPlane);
       });
 
       this.promise = new Promise((resolve) => {
@@ -154,38 +146,14 @@ class Plane {
     const distance = new THREE.Vector3(0, 0, 1).distanceTo(currentPositionVector);
     let opacity = 1 - ( 1 / (1 + Math.exp(-6.3 * (distance - 1.1))) ) ;
 
-    if(this.isLoaded){
-      this.test += 0.01;
-      this.texturedPlane.rotateOnAxis(currentPositionVector.normalize(), this.test);
+    if(this.texturedPlane){
+      this.test += 0.001;
+      this.texturedPlane.rotateZ(0.01);
 
-      this.texturedPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
-      //this.emptyFlatPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
-      //this.emptyFlatPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
+
+      this.motherPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       this.playPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
-
       this.planeMaterial.opacity = opacity;
-
-    }
-
-    if(this.chapter){
-      this.chapter.material.opacity = opacity;
-
-      const textWidth_chapter = this.chapter.geometry.boundingBox.max.x - this.chapter.geometry.boundingBox.min.x;
-
-      ////
-      let hv = new THREE.Vector3(-textWidth_chapter / 2, 0.07, 0);
-      hv.applyAxisAngle(this.yVector, this.currentAngle);
-      this.chapter.position.set(hv.x, 0.07, hv.z);
-      this.chapter.setRotationFromAxisAngle(this.yVector, this.currentAngle);
-      this.chapter.translateZ(this.radius);
-      ////
-      
-      //this.chapter.position.set(-textWidth_chapter / 2, 0.07, 0);
-      //this.chapter.setRotationFromAxisAngle(this.yVector, this.currentAngle);
-      //this.chapter.translateOnAxis(currentPositionVector, this.radius);
-      
-      this.chapter.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height)
-      this.chapter.sync();
     }
 
     this.dateTroika.material.opacity = opacity * this.maxOpacity;
@@ -204,20 +172,6 @@ class Plane {
 
   getCurrentAngleInRad(){
     return this.currentAngle;
-  }
-  
-  select(){
-    this.selected = true;
-    //this.scale = 1.15;
-    //this.dateTroika.color = 0xFFFFFF;
-    //this.dateTroika.fontSizeTitle = this.fontSizeTitle + 0.05;
-  }
-
-  unselect(){
-    this.selected = false;
-    //this.scale = 1;
-    //this.dateTroika.color = 0x888888;
-    //this.dateTroika.fontSizeTitle = this.fontSizeTitle;
   }
 
   setOpacity(alpha){

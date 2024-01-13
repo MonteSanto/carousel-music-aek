@@ -121,16 +121,6 @@ class Carousel{
         }
     }
 
-    showCurrentObjectDate(){
-        for (let i = 0; i < this.planes.length; i++){
-
-            if(i == this.getCurrentObjectInViewIndex())
-                this.planes[i].select();
-            else this.planes[i].unselect();
-
-        }
-    }
-
     showPlayButtonOfCurrentObject(){
         for (let i = 0; i < this.planes.length; i++){
             if(i == this.getCurrentObjectInViewIndex())

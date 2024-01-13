@@ -377,8 +377,6 @@ function animate() {
 	clock.start();
 
 	skyDome.setRotationFromAxisAngle(new THREE.Vector3(0, 1, 0), carousel.getCurrentAngleInRad());
-
-	carousel.showCurrentObjectDate();
 	carousel.animate();
 	ui.animate(deltaTime);
 
@@ -406,18 +404,18 @@ function lerp(a, b, alpha){
 }
 
 function handleMusicPlayerButton(selectedObject){
-	console.log("click button play/pause");
-	if(selectedObject.buttonIcon=="pause"){
+	console.log('click button play/pause');
+	if(selectedObject.buttonIcon == 'pause'){
 		carousel.sound.pause();
 		if(playMaterial == null){
-			getTextureLoader().load("icons/play.png", (texture) => {
+			getTextureLoader().load('icons/play.png', (texture) => {
 				playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
 				selectedObject.material = playMaterial;
-				selectedObject.buttonIcon = "play";
+				selectedObject.buttonIcon = 'play';
 			  });
 		}else{
 			selectedObject.material = playMaterial;
-			selectedObject.buttonIcon = "play";
+			selectedObject.buttonIcon = 'play';
 		}
 
 		isMusicPaused = true;
