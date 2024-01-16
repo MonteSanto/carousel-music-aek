@@ -53,6 +53,9 @@ class Sound{
         this.sound.stop();   
     }
 
+    isMusicPlaying() {
+        return this.sound && this.sound.playing();
+    }
 }
 
 export { Sound };

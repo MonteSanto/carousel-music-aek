@@ -141,7 +141,6 @@ function init(){
                 idle = false;
                 currentMouseX = touch.clientX
                 ui.onOrthographicMouseMove();
-				stopMusic();
             }
         }
     }, false);
@@ -192,7 +191,6 @@ function init(){
 		isMouseDown = false
 		previousMouseX = null;
 		currentMouseX = null;
-		stopMusic();
 	});
 
 	window.addEventListener( 'resize', onWindowResize, false );
@@ -324,6 +322,7 @@ function animate() {
 			
 			if(distanceX == 0 && Math.abs(previousDistanceX) > 10){
 				distanceX = previousDistanceX;
+				stopMusic();
 			}else {
 
 				popUp.close();
@@ -407,6 +406,7 @@ function handleMusicPlayerButton(selectedObject){
 	console.log('click button play/pause');
 	if(selectedObject.buttonIcon == 'pause'){
 		carousel.sound.pause();
+		setPlayMaterial(selectedObject);
 		if(playMaterial == null){
 			getTextureLoader().load('icons/play.png', (texture) => {
 				playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
@@ -417,21 +417,13 @@ function handleMusicPlayerButton(selectedObject){
 			selectedObject.material = playMaterial;
 			selectedObject.buttonIcon = 'play';
 		}
-
+		selectedExhibit.setRotatePlane(false);
 		isMusicPaused = true;
 	}else{
 		playMusic(selectedObject.musicTrack);
-		if(pauseMaterial == null){
-			getTextureLoader().load("icons/pause.png", (texture) => {
-				pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
-				selectedObject.material = pauseMaterial;
-				selectedObject.buttonIcon = "pause";
-			  });
-		}else{
-			selectedObject.material = pauseMaterial;
-			selectedObject.buttonIcon = "pause";
-		}
-		  isMusicPaused = false;
+		setPauseMaterial(selectedObject);
+		isMusicPaused = false;
+		selectedExhibit.setRotatePlane(true);
 	}
 }
 
@@ -446,8 +438,37 @@ function playMusic(musicTrack){
 }
 
 function stopMusic(){
+	selectedExhibit.setRotatePlane(false);
 	isMusicPaused = false;
 	carousel.sound.stop();
+	setPlayMaterial(selectedExhibit.playPlane);
+}
+
+function setPlayMaterial(mesh){
+	if(playMaterial == null){
+		getTextureLoader().load('icons/play.png', (texture) => {
+			playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+			mesh.material = playMaterial;
+			mesh.buttonIcon = 'play';
+		  });
+	}else{
+		mesh.material = playMaterial;
+		mesh.buttonIcon = 'play';
+	}
+}
+
+function setPauseMaterial(mesh){
+	if(pauseMaterial == null){
+		getTextureLoader().load("icons/pause.png", (texture) => {
+			pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
+			mesh.material = pauseMaterial;
+			mesh.buttonIcon = 'pause';
+		  });
+	}else{
+		mesh.material = pauseMaterial;
+		mesh.buttonIcon = 'pause';
+		console.log("mesh button icon: " + mesh.buttonIcon);
+	}
 }
 
 init()

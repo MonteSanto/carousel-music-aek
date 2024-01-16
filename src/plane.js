@@ -40,6 +40,8 @@ class Plane {
   isTitleVisible = true;
   maxOpacity = 1;
 
+  rotatePlane = false;
+
   constructor(exhibit, scene, angleInDegrees, height, musicButtons) {
     this.height = height;
     this.currentAngle = THREE.MathUtils.degToRad(angleInDegrees);
@@ -148,8 +150,9 @@ class Plane {
 
     if(this.texturedPlane){
       this.test += 0.001;
-      this.texturedPlane.rotateZ(-0.01);
-
+      if(this.rotatePlane){
+        this.texturedPlane.rotateZ(-0.01);
+      }
 
       this.motherPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       this.playPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
@@ -218,6 +221,10 @@ class Plane {
       this.playPlane.material = pauseMaterial;
       this.playPlane.buttonIcon = "pause";
     });
+  }
+
+  setRotatePlane(rotatePlane){
+    this.rotatePlane = rotatePlane;
   }
 }
 
