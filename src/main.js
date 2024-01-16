@@ -30,7 +30,7 @@ let firstTouchId = null;
 
 let idle = false;
 
-let secondsToIdle = 60;
+let secondsToIdle = 7;
 let idleTime = secondsToIdle; // starting the app in idle mode
 let maxidleTimePause = 4
 let idleTimePause = 0;
@@ -47,6 +47,8 @@ let zoomAnimationIn;
 let goToStart = false;
 
 let selectedExhibit;
+let selectedExhibitIndex = 0;
+let previousExhibitIndex = 0;
 
 let isMusicPaused = false;
 
@@ -214,7 +216,7 @@ function init(){
 		ui.setTitleOpacity(alpha);
 		ui.setStartButtonOpacity(1-alpha);
     	selectedPlane.current = 5;
-		carousel.sound.stop();
+		stopMusic();
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
@@ -290,7 +292,15 @@ function animate() {
 	zoomAnimationOut.animate(deltaTime);
 	zoomAnimationIn.animate(deltaTime);
 
-	selectedExhibit = carousel.planes[carousel.getCurrentObjectInViewIndex()];
+	selectedExhibitIndex = carousel.getCurrentObjectInViewIndex();
+	selectedExhibit = carousel.planes[selectedExhibitIndex];
+
+	console.log("selected index: " +selectedExhibitIndex);
+	if(previousExhibitIndex != selectedExhibitIndex){
+		console.log("STOOOP music")
+		stopMusic();
+		previousExhibitIndex = selectedExhibitIndex;
+	}
 
 
 	if(!idle && isIdleState()) {
@@ -309,7 +319,7 @@ function animate() {
 				selectedPlane.current = selectedPlane.current + Math.floor(Math.random() * 10) - 5;
 
 				if(selectedPlane.current < 0 ) selectedPlane.current = 0;
-				else if(selectedPlane.current > carousel.planes.lenght - 1) selectedPlane.current = carousel.planes.length() - 1
+				else if(selectedPlane.current > carousel.planes.length - 1) selectedPlane.current = carousel.planes.length - 1
 				idleTimePause = 0;
 			}
 		}
@@ -322,11 +332,10 @@ function animate() {
 			
 			if(distanceX == 0 && Math.abs(previousDistanceX) > 10){
 				distanceX = previousDistanceX;
-				stopMusic();
 			}else {
 
 				popUp.close();
-				
+
 				speed = distanceX / deltaTime;
 				speed = speed * scrollSpeed;
 				
@@ -355,8 +364,11 @@ function animate() {
 			carousel.goTowardsSpecificObject(deltaTime, selectedPlane.current);
 		}else if(!goToStart){
 			//POP UP OPEN CONDITIONS
-			if(Math.abs(speed) == 0 && !idle && !hasKinetic) popUp.open();
+			if(Math.abs(speed) == 0 && !idle && !hasKinetic){
+				popUp.open();
+			}
 			carousel.goTowardsAnObject(deltaTime);
+
 		}
 
 	}
@@ -403,7 +415,6 @@ function lerp(a, b, alpha){
 }
 
 function handleMusicPlayerButton(selectedObject){
-	console.log('click button play/pause');
 	if(selectedObject.buttonIcon == 'pause'){
 		carousel.sound.pause();
 		setPlayMaterial(selectedObject);
@@ -438,10 +449,11 @@ function playMusic(musicTrack){
 }
 
 function stopMusic(){
-	selectedExhibit.setRotatePlane(false);
+	let previousExhibit = carousel.planes[previousExhibitIndex];
+	previousExhibit.setRotatePlane(false);
 	isMusicPaused = false;
 	carousel.sound.stop();
-	setPlayMaterial(selectedExhibit.playPlane);
+	setPlayMaterial(previousExhibit.playPlane);
 }
 
 function setPlayMaterial(mesh){
@@ -467,7 +479,6 @@ function setPauseMaterial(mesh){
 	}else{
 		mesh.material = pauseMaterial;
 		mesh.buttonIcon = 'pause';
-		console.log("mesh button icon: " + mesh.buttonIcon);
 	}
 }
 

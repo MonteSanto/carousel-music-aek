@@ -1,4 +1,3 @@
-const exhibit_0  = {path: "chapter", id:1, titleGR: "Music", titleEN:" ", date: "", descriptionGR: "", sound: ""}
 
 const exhibit_1  = {path: "images/1.png", id:2, titleGR: "ΤΑ ΧΡΥΣΑ ΧΕΡΙΑ", titleEN:" ", date: "", descriptionGR: "", sound: "s1.mp3"}
 const exhibit_2  = {path: "images/2.png", id:3, titleGR: "ΑΕΚΑΡΑ", titleEN:" ", date: "", descriptionGR: "", sound: "s2.mp3"}
@@ -21,7 +20,6 @@ const exhibit_16  = {path: "images/16.png", id:7, titleGR: "ΥΜΝΟΣ ΤΗΣ Α
 
 const exhibits = 
     [
-    exhibit_0,
     exhibit_1,
     exhibit_2,
     exhibit_3,
