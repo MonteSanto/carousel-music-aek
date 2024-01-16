@@ -217,6 +217,7 @@ function init(){
 		ui.setStartButtonOpacity(1-alpha);
     	selectedPlane.current = 5;
 		stopMusic();
+		setPlayButtonsOpacity(1-alpha);
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
@@ -226,6 +227,7 @@ function init(){
     	})
 		ui.setTitleOpacity(1-alpha);
 		ui.setStartButtonOpacity(alpha);
+		setPlayButtonsOpacity(alpha);
 	})
 
 	//BACKGROUND LOGO
@@ -480,6 +482,14 @@ function setPauseMaterial(mesh){
 		mesh.material = pauseMaterial;
 		mesh.buttonIcon = 'pause';
 	}
+}
+
+function setPlayButtonsOpacity(alpha){
+	carousel.musicButtons.forEach(button => {
+		if(button.material){
+			button.material.opacity = alpha;
+		}
+	});
 }
 
 init()
