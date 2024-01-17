@@ -30,7 +30,7 @@ let firstTouchId = null;
 
 let idle = false;
 
-let secondsToIdle = 7;
+let secondsToIdle = 60;
 let idleTime = secondsToIdle; // starting the app in idle mode
 let maxidleTimePause = 4
 let idleTimePause = 0;
@@ -39,7 +39,7 @@ let hasKinetic = false;
 
 let popUp;
 
-let selectedPlane = {current: 5, onClick: function() {goToStart=true; popUp.close()} };
+let selectedVinyl = {current: 5, onClick: function() {goToStart=true; popUp.close()} };
 
 let zoomAnimationOut;
 let zoomAnimationIn;
@@ -205,25 +205,25 @@ function init(){
 	carousel = new Carousel(scene, itemsPerRevolution, spiraleThreadHeight);
 	
 	//UI
-	ui = new UI(popUp, selectedPlane);
+	ui = new UI(popUp, selectedVinyl);
 
 	// ZOOM ANIMATION
 	zoomAnimationOut = new Animation(0.5, (alpha) => {
 		camera.position.z = lerp(cameraDefaultZ, cameraMaxZ, alpha);
-		carousel.planes.forEach(plane => {
-			plane.setOpacity(1-alpha);
+		carousel.vinyls.forEach(vinyl => {
+			vinyl.setOpacity(1-alpha);
     	})
 		ui.setTitleOpacity(alpha);
 		ui.setStartButtonOpacity(1-alpha);
-    	selectedPlane.current = 5;
+    	selectedVinyl.current = 5;
 		stopMusic();
 		setPlayButtonsOpacity(1-alpha);
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
 		camera.position.z = lerp(cameraMaxZ, cameraDefaultZ, alpha);
-		carousel.planes.forEach(plane => {
-			plane.setOpacity(alpha);
+		carousel.vinyls.forEach(vinyl => {
+			vinyl.setOpacity(alpha);
     	})
 		ui.setTitleOpacity(1-alpha);
 		ui.setStartButtonOpacity(alpha);
@@ -254,7 +254,7 @@ function init(){
 
 	document.addEventListener('keydown', (event) => {
 		if(event.code.startsWith("Digit")){
-			selectedPlane.current = event.key;
+			selectedVinyl.current = event.key;
 		} 
 	  }, false);
 }
@@ -295,11 +295,9 @@ function animate() {
 	zoomAnimationIn.animate(deltaTime);
 
 	selectedExhibitIndex = carousel.getCurrentObjectInViewIndex();
-	selectedExhibit = carousel.planes[selectedExhibitIndex];
+	selectedExhibit = carousel.vinyls[selectedExhibitIndex];
 
-	console.log("selected index: " +selectedExhibitIndex);
 	if(previousExhibitIndex != selectedExhibitIndex){
-		console.log("STOOOP music")
 		stopMusic();
 		previousExhibitIndex = selectedExhibitIndex;
 	}
@@ -315,13 +313,13 @@ function animate() {
 		popUp.close();
 		idle = true;
 
-		if(carousel.getCurrentObjectInViewIndex() == selectedPlane.current){
+		if(carousel.getCurrentObjectInViewIndex() == selectedVinyl.current){
 			idleTimePause += deltaTime;
 			if(idleTimePause > maxidleTimePause){
-				selectedPlane.current = selectedPlane.current + Math.floor(Math.random() * 10) - 5;
+				selectedVinyl.current = selectedVinyl.current + Math.floor(Math.random() * 10) - 5;
 
-				if(selectedPlane.current < 0 ) selectedPlane.current = 0;
-				else if(selectedPlane.current > carousel.planes.length - 1) selectedPlane.current = carousel.planes.length - 1
+				if(selectedVinyl.current < 0 ) selectedVinyl.current = 0;
+				else if(selectedVinyl.current > carousel.vinyls.length - 1) selectedVinyl.current = carousel.planes.length - 1
 				idleTimePause = 0;
 			}
 		}
@@ -363,7 +361,7 @@ function animate() {
 
 	if(!isMouseDown) {
 		if(isIdleState()){
-			carousel.goTowardsSpecificObject(deltaTime, selectedPlane.current);
+			carousel.goTowardsSpecificObject(deltaTime, selectedVinyl.current);
 		}else if(!goToStart){
 			//POP UP OPEN CONDITIONS
 			if(Math.abs(speed) == 0 && !idle && !hasKinetic){
@@ -451,7 +449,7 @@ function playMusic(musicTrack){
 }
 
 function stopMusic(){
-	let previousExhibit = carousel.planes[previousExhibitIndex];
+	let previousExhibit = carousel.vinyls[previousExhibitIndex];
 	previousExhibit.setRotatePlane(false);
 	isMusicPaused = false;
 	carousel.sound.stop();

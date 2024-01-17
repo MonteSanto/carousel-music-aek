@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Text } from 'troika-three-text';
 import { getTextureLoader } from './loaders.js';
 
-class Plane {
+class Vinyl {
   texturedPlane;
   playPlane;
 
@@ -228,4 +228,4 @@ class Plane {
   }
 }
 
-export {Plane};
+export {Vinyl};

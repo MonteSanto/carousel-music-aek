@@ -1,11 +1,11 @@
 import { exhibits } from "./variable.js";
-import {Plane} from './plane.js';
+import {Vinyl} from './vinyl.js';
 import {Sound} from './sound.js';
 
 
 class Carousel{
 
-    planes = [];
+    vinyls = [];
 
     anglePartitioning;
     halfAnglePartitioning;
@@ -17,7 +17,7 @@ class Carousel{
     testMinValue = 0;
 
     sound;
-    planesPromise;
+    vinylsPromise;
     musicButtons = [];
 
     constructor(scene, imagesPerRevolution = 12, spiraleThreadHeight = 0){
@@ -31,9 +31,9 @@ class Carousel{
 
         this.sound = new Sound("sounds/track_1.wav");
         
-        this.planesPromise = new Promise(() => {
+        this.vinylsPromise = new Promise(() => {
             for (let i = 0; i < exhibits.length; i++) {
-                this.planes.push( new Plane(exhibits[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning, this.musicButtons));
+                this.vinyls.push( new Vinyl(exhibits[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning, this.musicButtons));
             }
         });
 
@@ -49,35 +49,35 @@ class Carousel{
     }
 
     setAngle(angle){
-        for (let i = 0; i < this.planes.length; i++) {
-            this.planes[i].setAngle(angle);
+        for (let i = 0; i < this.vinyls.length; i++) {
+            this.vinyls[i].setAngle(angle);
         }
     }
 
     getCurrentAngleInDeg(){
-        return this.planes[0].getCurrentAngleInDeg();
+        return this.vinyls[0].getCurrentAngleInDeg();
     }
 
     getCurrentAngleInRad(){
-        return this.planes[0].getCurrentAngleInRad();
+        return this.vinyls[0].getCurrentAngleInRad();
     }
 
-    getAngleOf(plane){
-        return this.planes[plane].getCurrentAngleInDeg();
+    getAngleOf(vinyl){
+        return this.vinyls[vinyl].getCurrentAngleInDeg();
     }
 
     getCurrentObjectInViewIndex(){
         let index = Math.abs(Math.round(this.getCurrentAngleInDeg() / this.anglePartitioning));
-        if(index < this.planes.length){
+        if(index < this.vinyls.length){
             return index;
         }else{
-            return this.planes.length - 1;
+            return this.vinyls.length - 1;
         }
     }
 
     animate(){
         for (let i = 0; i < exhibits.length; i++) {
-            this.planes[i].animate();
+            this.vinyls[i].animate();
         }
     }
 
@@ -122,17 +122,17 @@ class Carousel{
     }
 
     showPlayButtonOfCurrentObject(){
-        for (let i = 0; i < this.planes.length; i++){
+        for (let i = 0; i < this.vinyls.length; i++){
             if(i == this.getCurrentObjectInViewIndex())
-                this.planes[i].showPlayButton();
-            else this.planes[i].hidePlayButton();
+                this.vinyls[i].showPlayButton();
+            else this.vinyls[i].hidePlayButton();
         }
     }
 
     getMusicButtons(){
-        this.planesPromise.then(() => {
-            this.planes.forEach(plane => {
-                this.musicButtons.push(plane.playPlane);
+        this.vinylsPromise.then(() => {
+            this.vinyls.forEach(vinyl => {
+                this.musicButtons.push(vinyl.playPlane);
             })
         });
     }
