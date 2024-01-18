@@ -1,7 +1,5 @@
-import { exhibits } from "./variable.js";
+import { vinylsList } from "./variable.js";
 import {Vinyl} from './vinyl.js';
-import {Sound} from './sound.js';
-
 
 class Carousel{
 
@@ -16,28 +14,22 @@ class Carousel{
     testMaxValue = 0;
     testMinValue = 0;
 
-    sound;
     vinylsPromise;
-    musicButtons = [];
 
     constructor(scene, imagesPerRevolution = 12, spiraleThreadHeight = 0){
         this.imagesPerRevolution = imagesPerRevolution;
 
-        if(spiraleThreadHeight == 0){ imagesPerRevolution = exhibits.length}
+        if(spiraleThreadHeight == 0){ imagesPerRevolution = vinylsList.length}
 
         this.anglePartitioning = 360 / imagesPerRevolution;
         this.halfAnglePartitioning = this.anglePartitioning / 2;
         this.heightPartitioning = spiraleThreadHeight / imagesPerRevolution;
-
-        this.sound = new Sound("sounds/track_1.wav");
         
         this.vinylsPromise = new Promise(() => {
-            for (let i = 0; i < exhibits.length; i++) {
-                this.vinyls.push( new Vinyl(exhibits[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning, this.musicButtons));
+            for (let i = 0; i < vinylsList.length; i++) {
+                this.vinyls.push( new Vinyl(vinylsList[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning));
             }
         });
-
-        this.getMusicButtons();
     }
 
     getAngularDistanceToCloserObjectNormalized(){
@@ -75,8 +67,21 @@ class Carousel{
         }
     }
 
+    getCurrentObjectInView(){
+        let index = Math.abs(Math.round(this.getCurrentAngleInDeg() / this.anglePartitioning));
+        if(index < this.vinyls.length){
+            return this.vinyls[index];
+        }
+    }
+
+    getCurrentVinylPlaying(){
+        for (let i = 0; i < this.vinyls.length; i++) {
+            if(this.vinyls[i].isPlaying) return this.vinyls[i];
+        }
+    }
+
     animate(){
-        for (let i = 0; i < exhibits.length; i++) {
+        for (let i = 0; i < this.vinyls.length; i++) {
             this.vinyls[i].animate();
         }
     }
@@ -88,9 +93,9 @@ class Carousel{
 
             this.angularDistanceToCloserObject = this.getCurrentAngleInDeg();
 
-        }else if(this.getCurrentAngleInDeg() < -this.anglePartitioning * (exhibits.length - 1)  ){
+        }else if(this.getCurrentAngleInDeg() < -this.anglePartitioning * (this.vinyls.length - 1)  ){
 
-            this.angularDistanceToCloserObject = this.getCurrentAngleInDeg() - (-this.anglePartitioning * (exhibits.length - 1));
+            this.angularDistanceToCloserObject = this.getCurrentAngleInDeg() - (-this.anglePartitioning * (this.vinyls.length - 1));
 
         }else{
             
@@ -124,17 +129,21 @@ class Carousel{
     showPlayButtonOfCurrentObject(){
         for (let i = 0; i < this.vinyls.length; i++){
             if(i == this.getCurrentObjectInViewIndex())
-                this.vinyls[i].showPlayButton();
-            else this.vinyls[i].hidePlayButton();
+                this.vinyls[i].setPlayButtonOpacity(1);
+            else this.vinyls[i].setPlayButtonOpacity(0);
         }
     }
 
-    getMusicButtons(){
-        this.vinylsPromise.then(() => {
-            this.vinyls.forEach(vinyl => {
-                this.musicButtons.push(vinyl.playPlane);
-            })
-        });
+    stopAllMusic(){
+        for (let i = 0; i < this.vinyls.length; i++){
+            this.vinyls[i].stop();
+        }
+    }
+
+    setPlayButtonsOpacity(alpha){
+        for (let i = 0; i < this.vinyls.length; i++){
+            this.vinyls[i].setPlayButtonOpacity(alpha);
+        }
     }
 }
 

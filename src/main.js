@@ -6,7 +6,6 @@ import backgroundShader from './backgroundShader.js';
 import { getTextureLoader } from './loaders.js';
 import Animation from './animation.js';
 
-
 let scene, renderer, camera, raycaster, skyDomeScene, skyDome, skyMaterial, ui, backgroundLogo, mouseCoordinates;
 let carousel;
 let distanceX = 0;
@@ -40,20 +39,12 @@ let hasKinetic = false;
 let popUp;
 
 let selectedVinyl = {current: 5, onClick: function() {goToStart=true; popUp.close()} };
+let previousVinylInView = null;
 
 let zoomAnimationOut;
 let zoomAnimationIn;
 
 let goToStart = false;
-
-let selectedExhibit;
-let selectedExhibitIndex = 0;
-let previousExhibitIndex = 0;
-
-let isMusicPaused = false;
-
-let playMaterial = null;
-let pauseMaterial = null;
 
 function init(){
 	raycaster = new THREE.Raycaster();
@@ -131,20 +122,20 @@ function init(){
     }, false);
     
     document.addEventListener('touchmove', (event) => {
-        //event.preventDefault();
+			//event.preventDefault();
 
-        for (let i = 0; i < event.touches.length; i++) {
-            const touch = event.touches[i];
-    
-            // Only handle the touch if it's the first touch
-            if (touch.identifier === firstTouchId) {
-                // Handle the movement of the first touch here
-                idleTime = 0;
-                idle = false;
-                currentMouseX = touch.clientX
-                ui.onOrthographicMouseMove();
-            }
-        }
+			for (let i = 0; i < event.touches.length; i++) {
+					const touch = event.touches[i];
+	
+					// Only handle the touch if it's the first touch
+					if (touch.identifier === firstTouchId) {
+							// Handle the movement of the first touch here
+							idleTime = 0;
+							idle = false;
+							currentMouseX = touch.clientX
+							ui.onOrthographicMouseMove();
+					}
+			}
     }, false);
 
     document.addEventListener('touchend', (event) => {
@@ -165,7 +156,6 @@ function init(){
             }
         }
     }, false);
-    //---------------------
 
 	document.addEventListener('pointerdown', (event) => {
 		goToStart = false;
@@ -186,7 +176,6 @@ function init(){
 	});
 
 	document.addEventListener('pointerup', (event) => {
-
 		idleTime = 0;
 		idle = false;
 		//event.preventDefault();
@@ -216,8 +205,8 @@ function init(){
 		ui.setTitleOpacity(alpha);
 		ui.setStartButtonOpacity(1-alpha);
     	selectedVinyl.current = 5;
-		stopMusic();
-		setPlayButtonsOpacity(1-alpha);
+			carousel.stopAllMusic();
+			carousel.setPlayButtonsOpacity(0);
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
@@ -227,7 +216,7 @@ function init(){
     	})
 		ui.setTitleOpacity(1-alpha);
 		ui.setStartButtonOpacity(alpha);
-		setPlayButtonsOpacity(alpha);
+		carousel.setPlayButtonsOpacity(alpha);
 	})
 
 	//BACKGROUND LOGO
@@ -251,12 +240,6 @@ function init(){
 
 		scene.add(mesh);
 	});
-
-	document.addEventListener('keydown', (event) => {
-		if(event.code.startsWith("Digit")){
-			selectedVinyl.current = event.key;
-		} 
-	  }, false);
 }
 
 function onWindowResize() {
@@ -273,14 +256,14 @@ function onClick(event) {
 	mouseCoordinates.y = -( window.event.clientY / window.innerHeight ) * 2 + 1;
 		
 	raycaster.setFromCamera(mouseCoordinates, camera);
-
-	let intersects = raycaster.intersectObjects(carousel.musicButtons);
+	let intersects = raycaster.intersectObjects(scene.children);
+	let vinylInView = carousel.getCurrentObjectInView()
 
 	if (intersects.length > 0){
-		let selectedMusic = intersects[0].object;
-		handleMusicPlayerButton(selectedMusic);
+		if(intersects[0].object == vinylInView.playButton){
+			vinylInView.togglePlayPause();
+		}
 	}
-
 }
 
 function animate() {
@@ -294,14 +277,13 @@ function animate() {
 	zoomAnimationOut.animate(deltaTime);
 	zoomAnimationIn.animate(deltaTime);
 
-	selectedExhibitIndex = carousel.getCurrentObjectInViewIndex();
-	selectedExhibit = carousel.vinyls[selectedExhibitIndex];
 
-	if(previousExhibitIndex != selectedExhibitIndex){
-		stopMusic();
-		previousExhibitIndex = selectedExhibitIndex;
+	let currentVinylInView = carousel.getCurrentObjectInView();
+
+	if(currentVinylInView != previousVinylInView){
+		carousel.stopAllMusic();
+		previousVinylInView = currentVinylInView;
 	}
-
 
 	if(!idle && isIdleState()) {
 		idle = true;
@@ -333,7 +315,6 @@ function animate() {
 			if(distanceX == 0 && Math.abs(previousDistanceX) > 10){
 				distanceX = previousDistanceX;
 			}else {
-
 				popUp.close();
 
 				speed = distanceX / deltaTime;
@@ -368,9 +349,7 @@ function animate() {
 				popUp.open();
 			}
 			carousel.goTowardsAnObject(deltaTime);
-
 		}
-
 	}
 
 	if(goToStart){
@@ -381,8 +360,6 @@ function animate() {
 		}
 	} 
 
-	// Camera zoom while rotated
-	// if(Math.abs(speed) > 40) camera.position.z = cameraDefaultZ + 0.001 * Math.abs(speed);
 	camera.position.y = spiraleThreadHeight * (carousel.getCurrentAngleInDeg() / 360) + cameraPositionOffset.y;
 	
 	clock.start();
@@ -391,7 +368,6 @@ function animate() {
 	carousel.animate();
 	ui.animate(deltaTime);
 
-	popUp.update(deltaTime, selectedExhibit);
 	carousel.showPlayButtonOfCurrentObject();
 
 	renderer.clear();
@@ -412,82 +388,6 @@ function isIdleState() {
 
 function lerp(a, b, alpha){
 	return a + alpha * (b - a);
-}
-
-function handleMusicPlayerButton(selectedObject){
-	if(selectedObject.buttonIcon == 'pause'){
-		carousel.sound.pause();
-		setPlayMaterial(selectedObject);
-		if(playMaterial == null){
-			getTextureLoader().load('icons/play.png', (texture) => {
-				playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
-				selectedObject.material = playMaterial;
-				selectedObject.buttonIcon = 'play';
-			  });
-		}else{
-			selectedObject.material = playMaterial;
-			selectedObject.buttonIcon = 'play';
-		}
-		selectedExhibit.setRotatePlane(false);
-		isMusicPaused = true;
-	}else{
-		playMusic(selectedObject.musicTrack);
-		setPauseMaterial(selectedObject);
-		isMusicPaused = false;
-		selectedExhibit.setRotatePlane(true);
-	}
-}
-
-function playMusic(musicTrack){
-	if(isMusicPaused){
-		carousel.sound.play();
-	}else{
-		carousel.sound.stop();
-		carousel.sound.changeMusicSource("sounds/" + musicTrack);
-		carousel.sound.play();
-	}
-}
-
-function stopMusic(){
-	let previousExhibit = carousel.vinyls[previousExhibitIndex];
-	previousExhibit.setRotatePlane(false);
-	isMusicPaused = false;
-	carousel.sound.stop();
-	setPlayMaterial(previousExhibit.playPlane);
-}
-
-function setPlayMaterial(mesh){
-	if(playMaterial == null){
-		getTextureLoader().load('icons/play.png', (texture) => {
-			playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
-			mesh.material = playMaterial;
-			mesh.buttonIcon = 'play';
-		  });
-	}else{
-		mesh.material = playMaterial;
-		mesh.buttonIcon = 'play';
-	}
-}
-
-function setPauseMaterial(mesh){
-	if(pauseMaterial == null){
-		getTextureLoader().load("icons/pause.png", (texture) => {
-			pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: 1});
-			mesh.material = pauseMaterial;
-			mesh.buttonIcon = 'pause';
-		  });
-	}else{
-		mesh.material = pauseMaterial;
-		mesh.buttonIcon = 'pause';
-	}
-}
-
-function setPlayButtonsOpacity(alpha){
-	carousel.musicButtons.forEach(button => {
-		if(button.material){
-			button.material.opacity = alpha;
-		}
-	});
 }
 
 init()

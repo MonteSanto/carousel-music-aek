@@ -136,6 +136,7 @@ class Button{
     }
 
     setTexture(){
+        if(this.material == null) return;
         if(this.isOn) this.material.map = this.onTexture;
         else this.material.map = this.offTexture;
     }

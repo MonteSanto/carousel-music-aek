@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { Text } from 'troika-three-text';
 import { getTextureLoader } from './loaders.js';
+import {Sound} from './sound.js';
 
 class Vinyl {
-  texturedPlane;
-  playPlane;
+  vinylMesh;
+  playButton;
 
   geometry;
   playGeometry;
@@ -25,8 +26,10 @@ class Vinyl {
   playMaterial;
   buttonOpacity = 0;
 
-  fatherPlane;
-  motherPlane;
+  isPlaying = false;
+
+  fatherObject;
+  motherObject;
 
   test = 0;
 
@@ -42,60 +45,60 @@ class Vinyl {
 
   rotatePlane = false;
 
-  constructor(exhibit, scene, angleInDegrees, height, musicButtons) {
+  constructor(exhibit, scene, angleInDegrees, height) {
     this.height = height;
     this.currentAngle = THREE.MathUtils.degToRad(angleInDegrees);
     this.currentAnglePlus180 = THREE.MathUtils.degToRad(angleInDegrees + 180);
     
     this.scene = scene;
-    if(exhibit.path.includes("chapter")){
-      this.chapter = new Text();
-      this.chapter.text = exhibit.descriptionGR;
-      this.chapter.font = 'fonts/jura/Jura-Regular.ttf';
-      this.chapter.fontSize = this.fontSize;
-      this.chapter.maxWidth = 0.30;
-      this.chapter.sync();
-      scene.add(this.chapter);
+	this.music = new Sound(exhibit.musicPath);
 
-      this.isChapter = true;
-    }
-    else{
-      getTextureLoader().load(exhibit.path, (texture) => {
+    getTextureLoader().load(exhibit.imagePath, (texture) => {
 
-        this.planeMaterial = new THREE.MeshBasicMaterial({
-          map: texture,
-          side: THREE.DoubleSide,
-          transparent: true,
-          alphaTest : 0.05,
-          blending: THREE.CustomBlending,
-          blendSrc: THREE.SrcAlphaFactor,
-          blendDst: THREE.OneMinusSrcAlphaFactor,
-          blendEquation: THREE.AddEquation
-        });
-    
-        const planeWidth = texture.image.naturalWidth * this.scale;
-        const planeHeight = texture.image.naturalHeight * this.scale * this.radius;
-    
-        this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
-        //this.geometry.translate(0, this.height, 1);
-        this.texturedPlane = new THREE.Mesh(this.geometry, this.planeMaterial);
-
-        this.fatherPlane = new THREE.Object3D();
-        this.fatherPlane.add(this.texturedPlane);
-        this.fatherPlane.translateY(this.height);
-        this.fatherPlane.translateZ(1);
-
-        this.motherPlane = new THREE.Object3D();
-        this.motherPlane.add(this.fatherPlane); 
-
-        this.scene.add(this.motherPlane);
+      this.planeMaterial = new THREE.MeshBasicMaterial({
+        map: texture,
+        side: THREE.DoubleSide,
+        transparent: true,
+        alphaTest : 0.05,
+        blending: THREE.CustomBlending,
+        blendSrc: THREE.SrcAlphaFactor,
+        blendDst: THREE.OneMinusSrcAlphaFactor,
+        blendEquation: THREE.AddEquation
       });
+  
+      const planeWidth = texture.image.naturalWidth * this.scale;
+      const planeHeight = texture.image.naturalHeight * this.scale * this.radius;
+  
+      this.geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
+      this.vinylMesh = new THREE.Mesh(this.geometry, this.planeMaterial);
 
-      this.promise = new Promise((resolve) => {
-        getTextureLoader().load("icons/play.png", (texture) => {
+      this.fatherObject = new THREE.Object3D();
+      this.fatherObject.add(this.vinylMesh);
+      this.fatherObject.translateY(this.height);
+      this.fatherObject.translateZ(1);
 
+      this.motherObject = new THREE.Object3D();
+      this.motherObject.add(this.fatherObject); 
+
+      this.scene.add(this.motherObject);
+    });
+
+    this.promise = new Promise((resolve) => {
+      getTextureLoader().load("icons/play.png", (playTexture) => {
+        getTextureLoader().load("icons/pause.png", (pauseTexture) => {
           this.playMaterial = new THREE.MeshBasicMaterial({
-              map: texture,
+              map: playTexture,
+              transparent: true,
+              opacity: this.buttonOpacity,
+              alphaTest : 0.05,
+              blending: THREE.CustomBlending,
+              blendSrc: THREE.SrcAlphaFactor,
+              blendDst: THREE.OneMinusSrcAlphaFactor,
+              blendEquation: THREE.AddEquation
+            });
+
+            this.pauseMaterial = new THREE.MeshBasicMaterial({
+              map: pauseTexture,
               transparent: true,
               opacity: this.buttonOpacity,
               alphaTest : 0.05,
@@ -105,21 +108,18 @@ class Vinyl {
               blendEquation: THREE.AddEquation
             });
       
-          const planeWidth = texture.image.naturalWidth * this.playScale;
-          const planeHeight = texture.image.naturalHeight * this.playScale * this.radius;
+          const planeWidth = playTexture.image.naturalWidth * this.playScale;
+          const planeHeight = playTexture.image.naturalHeight * this.playScale * this.radius;
       
-          //Textured Plane:
           this.playGeometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
           this.playGeometry.translate(0, this.height, 1);
-          this.playPlane = new THREE.Mesh(this.playGeometry, this.playMaterial);
-          this.playPlane.position.set(0,-0.22,0);
-          this.playPlane.musicTrack = exhibit.sound;
-          this.playPlane.buttonIcon = "play";
-          this.scene.add(this.playPlane);
-          musicButtons.push(this.playPlane);
+          this.playButton = new THREE.Mesh(this.playGeometry, this.playMaterial);
+          this.playButton.position.set(0,-0.22,0);
+          this.scene.add(this.playButton);
         });
       });
-    }
+    });
+    
 
     //DATES TROIKA
     this.dateTroika = new Text();
@@ -148,14 +148,14 @@ class Vinyl {
     const distance = new THREE.Vector3(0, 0, 1).distanceTo(currentPositionVector);
     let opacity = 1 - ( 1 / (1 + Math.exp(-6.3 * (distance - 1.1))) ) ;
 
-    if(this.texturedPlane){
-      this.test += 0.001;
-      if(this.rotatePlane){
-        this.texturedPlane.rotateZ(-0.01);
+    if(this.vinylMesh){
+
+      if(this.isPlaying){
+        this.vinylMesh.rotateZ(-0.01);
       }
 
-      this.motherPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
-      this.playPlane.setRotationFromAxisAngle(this.yVector, this.currentAngle);
+      this.motherObject.setRotationFromAxisAngle(this.yVector, this.currentAngle);
+      if(this.playButton) this.playButton.setRotationFromAxisAngle(this.yVector, this.currentAngle);
       this.planeMaterial.opacity = opacity;
     }
 
@@ -197,30 +197,32 @@ class Vinyl {
     return this.promise;
   }
 
-  showPlayButton(){
-    this.buttonOpacity = 1;
-    if(this.playMaterial) this.playMaterial.opacity = this.buttonOpacity;
+  setPlayButtonOpacity(alpha){
+    if(this.playButton) this.playButton.material.opacity = alpha;
   }
 
-  hidePlayButton(){
-    this.buttonOpacity = 0;
-    if(this.playMaterial) this.playMaterial.opacity = this.buttonOpacity;
+  play(){
+    if(this.playButton) this.playButton.material = this.pauseMaterial;
+    this.isPlaying = true;
+	this.music.play();
   }
 
-  changeToPlaybutton(){
-    getTextureLoader().load("icons/play.png", (texture) => {
-      this.playMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: this.buttonOpacity});
-      this.playPlane.material = playMaterial;
-      this.playPlane.buttonIcon = "play";
-    });
+  pause(){
+    this.playButton.material = this.playMaterial;
+    this.isPlaying = false;
+	this.music.pause();
   }
 
-  changeToPauseButton(){
-    getTextureLoader().load("icons/pause.png", (texture) => {
-      let pauseMaterial = new THREE.MeshBasicMaterial({map: texture, transparent: true, opacity: this.buttonOpacity});
-      this.playPlane.material = pauseMaterial;
-      this.playPlane.buttonIcon = "pause";
-    });
+  togglePlayPause(){
+    if(this.isPlaying) this.pause();
+    else this.play();
+  }
+
+  stop(){
+	if(this.playButton) this.playButton.material = this.playMaterial;
+    this.isPlaying = false;
+	if(this.vinylMesh) this.vinylMesh.rotation.z = 0;
+	this.music.stop();
   }
 
   setRotatePlane(rotatePlane){
