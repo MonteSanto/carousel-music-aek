@@ -11,8 +11,8 @@ let carousel;
 let distanceX = 0;
 let speed = 0;
 
-let spiraleThreadHeight = 1;
-let itemsPerRevolution = 8;
+let spiraleThreadHeight = 0;
+let itemsPerRevolution = 21;
 let cameraDefaultZ = 1.58;
 let cameraMaxZ = 3.5;
 
@@ -285,7 +285,7 @@ function animate() {
 		previousVinylInView = currentVinylInView;
 	}
 
-	if(!idle && isIdleState()) {
+	if(!idle && idleTime > secondsToIdle) {
 		idle = true;
 		zoomAnimationOut.play();
 	}
@@ -301,7 +301,7 @@ function animate() {
 				selectedVinyl.current = selectedVinyl.current + Math.floor(Math.random() * 10) - 5;
 
 				if(selectedVinyl.current < 0 ) selectedVinyl.current = 0;
-				else if(selectedVinyl.current > carousel.vinyls.length - 1) selectedVinyl.current = carousel.planes.length - 1
+				else if(selectedVinyl.current > carousel.vinyls.length - 1) selectedVinyl.current = carousel.vinyls.length - 1
 				idleTimePause = 0;
 			}
 		}
@@ -341,14 +341,14 @@ function animate() {
 	}
 
 	if(!isMouseDown) {
-		if(isIdleState()){
+		if(idleTime > secondsToIdle){
 			carousel.goTowardsSpecificObject(deltaTime, selectedVinyl.current);
 		}else if(!goToStart){
 			//POP UP OPEN CONDITIONS
 			if(Math.abs(speed) == 0 && !idle && !hasKinetic){
 				popUp.open();
 			}
-			carousel.goTowardsAnObject(deltaTime);
+			carousel.goTowardsClosestObject(deltaTime);
 		}
 	}
 
@@ -380,10 +380,6 @@ function animate() {
 
 	requestAnimationFrame( animate );
 	// stats.end();
-}
-
-function isIdleState() {
-	return idleTime > secondsToIdle;
 }
 
 function lerp(a, b, alpha){

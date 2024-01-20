@@ -1,3 +1,4 @@
+// import {Howl} from 'howler';
 
 class Sound{
 
@@ -28,10 +29,10 @@ class Sound{
                 }, 1000);
             },
             onpause: function() {
-                console.log('Audio is paused');
+                //console.log('Audio is paused');
             },
             onstop: function() {
-                console.log('Audio is stopped');
+                //console.log('Audio is stopped');
             }
         });
     }

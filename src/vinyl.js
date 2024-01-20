@@ -20,8 +20,8 @@ class Vinyl {
   radius = 1;
   fontSizeTitle = 0.018;
   fontSize = 0.012;
-  scale = 0.00015;
-  playScale = 0.00015;
+  scale = 0.00011;
+  playScale = 0.00013;
   planeMaterial;
   playMaterial;
   buttonOpacity = 0;

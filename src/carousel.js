@@ -10,6 +10,7 @@ class Carousel{
     heightPartitioning;
     imagesPerRevolution;
     angularDistanceToCloserObject = 0;
+    isCircular = false;
 
     testMaxValue = 0;
     testMinValue = 0;
@@ -19,7 +20,10 @@ class Carousel{
     constructor(scene, imagesPerRevolution = 12, spiraleThreadHeight = 0){
         this.imagesPerRevolution = imagesPerRevolution;
 
-        if(spiraleThreadHeight == 0){ imagesPerRevolution = vinylsList.length}
+        if(spiraleThreadHeight == 0){
+            imagesPerRevolution = vinylsList.length;
+            this.isCircular = true;
+        }
 
         this.anglePartitioning = 360 / imagesPerRevolution;
         this.halfAnglePartitioning = this.anglePartitioning / 2;
@@ -59,19 +63,23 @@ class Carousel{
     }
 
     getCurrentObjectInViewIndex(){
-        let index = Math.abs(Math.round(this.getCurrentAngleInDeg() / this.anglePartitioning));
-        if(index < this.vinyls.length){
-            return index;
-        }else{
-            return this.vinyls.length - 1;
+        let index = -Math.round(this.getCurrentAngleInDeg() / this.anglePartitioning) % this.vinyls.length;
+
+        if(!this.isCircular){
+            if(index < this.vinyls.length){
+                return index;
+            }else{
+                return this.vinyls.length - 1;
+            }
         }
+        
+        if (index < 0) return this.vinyls.length + index;
+        
+        return index;
     }
 
     getCurrentObjectInView(){
-        let index = Math.abs(Math.round(this.getCurrentAngleInDeg() / this.anglePartitioning));
-        if(index < this.vinyls.length){
-            return this.vinyls[index];
-        }
+        return this.vinyls[this.getCurrentObjectInViewIndex()];
     }
 
     getCurrentVinylPlaying(){
@@ -86,28 +94,25 @@ class Carousel{
         }
     }
 
-    goTowardsAnObject(deltaTime){
-        this.angularDistanceToCloserObject = 0;
+    goTowardsClosestObject(deltaTime){
+
+        this.angularDistanceToCloserObject = (this.getCurrentAngleInDeg() ) % this.anglePartitioning;
+            
+        if (this.angularDistanceToCloserObject > this.halfAnglePartitioning) {
+            this.angularDistanceToCloserObject -= this.anglePartitioning;
+            
+        } else if (this.angularDistanceToCloserObject < -this.halfAnglePartitioning) {
+            this.angularDistanceToCloserObject += this.anglePartitioning;
+        }
         
-        if(this.getCurrentAngleInDeg() > 0){
-
-            this.angularDistanceToCloserObject = this.getCurrentAngleInDeg();
-
-        }else if(this.getCurrentAngleInDeg() < -this.anglePartitioning * (this.vinyls.length - 1)  ){
-
-            this.angularDistanceToCloserObject = this.getCurrentAngleInDeg() - (-this.anglePartitioning * (this.vinyls.length - 1));
-
-        }else{
-            
-            this.angularDistanceToCloserObject = (this.getCurrentAngleInDeg() ) % this.anglePartitioning;
-            
-            if (this.angularDistanceToCloserObject > this.halfAnglePartitioning) {
-                this.angularDistanceToCloserObject -= this.anglePartitioning;
-                
-            } else if (this.angularDistanceToCloserObject < -this.halfAnglePartitioning) {
-                this.angularDistanceToCloserObject += this.anglePartitioning;
+        if(!this.isCircular){
+            if(this.getCurrentAngleInDeg() > 0){
+                this.angularDistanceToCloserObject = this.getCurrentAngleInDeg();
             }
-
+            
+            if(this.getCurrentAngleInDeg() < -this.anglePartitioning * (this.vinyls.length - 1)){
+                this.angularDistanceToCloserObject = this.getCurrentAngleInDeg() - (-this.anglePartitioning * (this.vinyls.length - 1));
+            }
         }
 
         this.setAngle(-this.angularDistanceToCloserObject * 2 * deltaTime);
