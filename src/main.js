@@ -14,7 +14,7 @@ let speed = 0;
 let spiraleThreadHeight = 0;
 let itemsPerRevolution = 21;
 let cameraDefaultZ = 1.68;
-let cameraMaxZ = 3.5;
+let cameraMaxZ = 3;
 
 const scrollSpeed = 0.05;
 
@@ -61,11 +61,11 @@ function init(){
 
 	// CAMERA
 	camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.z = cameraMaxZ;
+		camera.position.z = cameraMaxZ;
 
 	scene.add(camera);
 
-    // RENDERER
+		// RENDERER
 	let pixelRatio = window.devicePixelRatio
 
 	renderer = new THREE.WebGLRenderer({
@@ -103,25 +103,25 @@ function init(){
 	scene.add(skyDome);
 
 	//EVENT LISTENERS
-    document.addEventListener('touchstart', (event) => {
+		document.addEventListener('touchstart', (event) => {
 		goToStart = false;
-        //event.preventDefault();
+				//event.preventDefault();
 		//onClick(event);
-        if (firstTouchId === null && event.touches.length > 0) {
-            // Save the identifier of the first touch
-            firstTouchId = event.touches[0].identifier;
-            // Handle the first touch here
+				if (firstTouchId === null && event.touches.length > 0) {
+						// Save the identifier of the first touch
+						firstTouchId = event.touches[0].identifier;
+						// Handle the first touch here
 
-            idleTime = 0;
-            if(idle){
-                zoomAnimationIn.play();
-            }
-            idle = false;
-            isMouseDown = true;
-        }
-    }, false);
-    
-    document.addEventListener('touchmove', (event) => {
+						idleTime = 0;
+						if(idle){
+								zoomAnimationIn.play();
+						}
+						idle = false;
+						isMouseDown = true;
+				}
+		}, false);
+		
+		document.addEventListener('touchmove', (event) => {
 			//event.preventDefault();
 
 			for (let i = 0; i < event.touches.length; i++) {
@@ -136,26 +136,26 @@ function init(){
 							ui.onOrthographicMouseMove();
 					}
 			}
-    }, false);
+		}, false);
 
-    document.addEventListener('touchend', (event) => {
-        //event.preventDefault();
+		document.addEventListener('touchend', (event) => {
+				//event.preventDefault();
 
-        for (let i = 0; i < event.changedTouches.length; i++) {
-            const touch = event.changedTouches[i];
+				for (let i = 0; i < event.changedTouches.length; i++) {
+						const touch = event.changedTouches[i];
 
-            // Check if the first touch has ended
-            if (touch.identifier === firstTouchId) {
-                firstTouchId = null; // Reset the firstTouchId
-                // Handle the end of the first touch here
-                idleTime = 0;
-                idle = false;
-                isMouseDown = false
-                previousMouseX = null;
-                currentMouseX = null;
-            }
-        }
-    }, false);
+						// Check if the first touch has ended
+						if (touch.identifier === firstTouchId) {
+								firstTouchId = null; // Reset the firstTouchId
+								// Handle the end of the first touch here
+								idleTime = 0;
+								idle = false;
+								isMouseDown = false
+								previousMouseX = null;
+								currentMouseX = null;
+						}
+				}
+		}, false);
 
 	document.addEventListener('pointerdown', (event) => {
 		goToStart = false;
@@ -172,7 +172,7 @@ function init(){
 	});
 
 	document.addEventListener('pointermove', (event) => {
-    currentMouseX = event.clientX
+		currentMouseX = event.clientX
 	});
 
 	document.addEventListener('pointerup', (event) => {
@@ -194,28 +194,23 @@ function init(){
 	carousel = new Carousel(scene, itemsPerRevolution, spiraleThreadHeight);
 	
 	//UI
-	ui = new UI(popUp, selectedVinyl);
+	ui = new UI(popUp, (isOn) => {
+		if(isOn) zoomAnimationIn.play();
+		else zoomAnimationOut.play();
+	});
 
 	// ZOOM ANIMATION
 	zoomAnimationOut = new Animation(0.5, (alpha) => {
 		camera.position.z = lerp(cameraDefaultZ, cameraMaxZ, alpha);
-		carousel.vinyls.forEach(vinyl => {
-			vinyl.setOpacity(1-alpha);
-    	})
-		ui.setTitleOpacity(alpha);
-		ui.setStartButtonOpacity(1-alpha);
-    	selectedVinyl.current = 5;
-			carousel.stopAllMusic();
-			carousel.setPlayButtonsOpacity(0);
+		//carousel.vinyls.forEach(vinyl => vinyl.setOpacity(1 - alpha))
+		selectedVinyl.current = 5;
+		carousel.stopAllMusic();
+		carousel.setPlayButtonsOpacity(0);
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
 		camera.position.z = lerp(cameraMaxZ, cameraDefaultZ, alpha);
-		carousel.vinyls.forEach(vinyl => {
-			vinyl.setOpacity(alpha);
-    	})
-		ui.setTitleOpacity(1-alpha);
-		ui.setStartButtonOpacity(alpha);
+		//carousel.vinyls.forEach(vinyl => vinyl.setOpacity(alpha));
 		carousel.setPlayButtonsOpacity(alpha);
 	})
 
@@ -244,9 +239,9 @@ function init(){
 
 function onWindowResize() {
 	ui.resizeAspectRatio();
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize( window.innerWidth, window.innerHeight );
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+		renderer.setSize( window.innerWidth, window.innerHeight );
 }
 
 function onClick(event) {
@@ -276,7 +271,6 @@ function animate() {
 
 	zoomAnimationOut.animate(deltaTime);
 	zoomAnimationIn.animate(deltaTime);
-
 
 	let currentVinylInView = carousel.getCurrentObjectInView();
 

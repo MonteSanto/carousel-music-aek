@@ -11,18 +11,17 @@ class UI{
 
     tooltipText;
     popUp;
-    selectedPlane;
 
     screen = {
         width: window.innerWidth,
         height: window.innerHeight
     }
 
-    constructor(popUp, selectedPlane){
-        this.selectedPlane = selectedPlane;
+    constructor(popUp, onButtonClick){
 
         this.popUp = popUp;
         this.mouse = new THREE.Vector2();
+        this.onButtonClick = onButtonClick;
 
         this.aspect = window.innerWidth / window.innerHeight;
         this.frustrum = 1;
@@ -39,21 +38,21 @@ class UI{
         this.cameraOrtho.position.z = 1;
         this.sceneOrtho = new THREE.Scene();
 
-        let buttonsYOffset = 0.02;
+        let buttonsYOffset = 0.05;
         let spacing = 0.01;
         let size = 0.053;
 
-        this.start = new Button('START2', true, 'topCenter', spacing, buttonsYOffset, size * 1.6, this.sceneOrtho, this.cameraOrtho);
-        this.setStartButtonOpacity(0);
+        this.zoom = new Button('ZOOM', true, 'topCenter', spacing, buttonsYOffset, size * 1.2, this.sceneOrtho, this.cameraOrtho);
+        this.setStartButtonOpacity(1);
 
         this.createtitle("ΥΜΝΟΙ ΤΗΣ ΑΕΚ");
-        this.sceneOrtho.add(this.troikaTitle);
+        //this.sceneOrtho.add(this.troikaTitle);
 
-        this.createBackground(0x9b722f);
+        //this.createBackground(0x9b722f);
     }
 
     animate(delta){
-        this.start.update();
+        this.zoom.update();
     }
 
     closeMenu(){
@@ -71,23 +70,19 @@ class UI{
 
     onClick(x, y) {
         this.getMousePosition(x, y);
-
-        this.start.onClick(this.mouse, () => {
-            this.selectedPlane.current = 0;
-            this.selectedPlane.onClick();
-        });
+        this.zoom.onClick(this.mouse, this.onButtonClick);
     }
 
     onOrthographicMouseMove() {
         let mouseOver = false;
         this.getMousePosition();
-        mouseOver = mouseOver || this.start.isInsideBounds(this.mouse);
+        mouseOver = mouseOver || this.zoom.isInsideBounds(this.mouse);
         return mouseOver;
     }
 
     isClickInsideBounds() {
         this.getMousePosition();
-        return this.start.isInsideBounds(this.mouse);
+        return this.zoom.isInsideBounds(this.mouse);
     }
 
     getMousePosition(x, y){
@@ -125,7 +120,7 @@ class UI{
     }
 
     setStartButtonOpacity(alpha){
-        if(this.start.material) this.start.material.opacity = alpha;
+        if(this.zoom.material) this.zoom.material.opacity = alpha;
     }
 
 }

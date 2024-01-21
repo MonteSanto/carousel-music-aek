@@ -47,7 +47,6 @@ class Button{
                 this.geometry = new THREE.PlaneGeometry(diameter, diameter); 
 
                 this.material = new THREE.MeshBasicMaterial({transparent: true, side: THREE.DoubleSide});
-                this.material.opacity = 0;
                 this.setTexture();
 
                 this.mesh = new THREE.Mesh( this.geometry, this.material);

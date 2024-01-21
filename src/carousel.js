@@ -15,8 +15,6 @@ class Carousel{
     testMaxValue = 0;
     testMinValue = 0;
 
-    vinylsPromise;
-
     constructor(scene, imagesPerRevolution = 12, spiraleThreadHeight = 0){
         this.imagesPerRevolution = imagesPerRevolution;
 
@@ -29,11 +27,9 @@ class Carousel{
         this.halfAnglePartitioning = this.anglePartitioning / 2;
         this.heightPartitioning = spiraleThreadHeight / imagesPerRevolution;
         
-        this.vinylsPromise = new Promise(() => {
-            for (let i = 0; i < vinylsList.length; i++) {
-                this.vinyls.push( new Vinyl(vinylsList[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning));
-            }
-        });
+        for (let i = 0; i < vinylsList.length; i++) {
+            this.vinyls.push( new Vinyl(vinylsList[i], scene, i * this.anglePartitioning, -i * this.heightPartitioning));
+        }
     }
 
     getAngularDistanceToCloserObjectNormalized(){
