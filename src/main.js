@@ -14,7 +14,7 @@ let speed = 0;
 
 let spiraleThreadHeight = 0;
 let itemsPerRevolution = 21;
-let cameraDefaultZ = 1.68;
+let cameraDefaultZ = 1.55;
 let cameraMaxZ = 3;
 
 const scrollSpeed = 0.05;
@@ -30,7 +30,7 @@ let firstTouchId = null;
 
 let idle = false;
 
-let secondsToIdle = 6;
+let secondsToIdle = 60;
 let idleTime = secondsToIdle; // starting the app in idle mode
 let maxidleTimePause = 4
 let idleTimePause = 0;
@@ -316,6 +316,8 @@ function animate() {
 		carousel.stopAllMusic();
 		previousVinylInView = currentVinylInView;
 	}
+
+	if(currentVinylInView.music.sound.playing()) idleTime = 0;
 
 	if(!idle && idleTime > secondsToIdle) {
 		idle = true;
