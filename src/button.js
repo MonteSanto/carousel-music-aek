@@ -23,12 +23,13 @@ class Button{
         height: window.innerHeight
     }
 
-    constructor(imageName, isOn, alignment = 'center', offsetX = 0, offsetY = 0, diameter = 100, scene, camera){
+    constructor(imageName, isOn, alignment = 'center', offsetX = 0, offsetY = 0, diameter = 100, scene, camera, onButtonClick){
         this.isOn = isOn;
         this.alignment = alignment;
         this.offsetX = offsetX;
         this.offsetY = offsetY;
-        
+        this.onButtonClick = onButtonClick;
+
         this.mesh = null;
         
         this.camera = camera;
@@ -145,13 +146,16 @@ class Button{
         this.setTexture();
     }
 
-    onClick(mousePosition, callBack) {
+    onClick(mousePosition) {
         if(this.isInsideBounds(mousePosition)){
-            this.isOn = !this.isOn;
-            this.setTexture();
-            
-            callBack(this.isOn);
+            this.clickAction();
         }
+    }
+
+    clickAction() {
+        this.isOn = !this.isOn;
+        this.setTexture(); 
+        this.onButtonClick(this.isOn);
     }
 
     onMouseOver(mousePosition){

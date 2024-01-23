@@ -146,6 +146,12 @@ class Carousel{
             this.vinyls[i].setPlayButtonOpacity(alpha);
         }
     }
+
+    setTimesOpacity(alpha){
+        for (let i = 0; i < this.vinyls.length; i++){
+            this.vinyls[i].setTimeOpacity(alpha);
+        }
+    }
 }
 
 export {Carousel}

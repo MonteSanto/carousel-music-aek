@@ -5,8 +5,9 @@ import { PopUp } from './popUp.js';
 import backgroundShader from './backgroundShader.js';
 import { getTextureLoader } from './loaders.js';
 import Animation from './animation.js';
+import Stats from './stats.js';
 
-let scene, renderer, camera, raycaster, skyDomeScene, skyDome, skyMaterial, ui, backgroundLogo, mouseCoordinates;
+let scene, renderer, camera, raycaster, skyDomeScene, skyDome, skyMaterial, ui, stats, mouseCoordinates;
 let carousel;
 let distanceX = 0;
 let speed = 0;
@@ -45,6 +46,7 @@ let zoomAnimationOut;
 let zoomAnimationIn;
 
 let goToStart = false;
+let showStats = false;
 
 function init(){
 	raycaster = new THREE.Raycaster();
@@ -52,16 +54,15 @@ function init(){
 	mouseCoordinates = new THREE.Vector2();
 
 	//STATS
-	// stats = new Stats();
-	// stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
-	// document.body.appendChild( stats.dom );
+	stats = new Stats();
+	stats.showPanel(0); // 0: fps, 1: ms, 2: mb, 3+: custom
 
 	// SCENE
 	scene = new THREE.Scene();
 
 	// CAMERA
 	camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 1000);
-		camera.position.z = cameraMaxZ;
+	camera.position.z = cameraMaxZ;
 
 	scene.add(camera);
 
@@ -162,10 +163,9 @@ function init(){
 		//onClick(event);
 
 		idleTime = 0;
-		if(idle){
-				
-		zoomAnimationIn.play();
-		}
+		// if(!ui.zoom.isOn){		
+		// 	ui.zoom.clickAction();
+		// }
 		idle = false;
 		//event.preventDefault();
 		isMouseDown = true;
@@ -184,6 +184,7 @@ function init(){
 		currentMouseX = null;
 	});
 
+	window.addEventListener('keydown', onKeyDown, false);
 	window.addEventListener( 'resize', onWindowResize, false );
 	window.addEventListener('click', onClick);
 	
@@ -206,12 +207,12 @@ function init(){
 		selectedVinyl.current = 5;
 		carousel.stopAllMusic();
 		carousel.setPlayButtonsOpacity(0);
+		carousel.setTimesOpacity(0)
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
 		camera.position.z = lerp(cameraMaxZ, cameraDefaultZ, alpha);
-		//carousel.vinyls.forEach(vinyl => vinyl.setOpacity(alpha));
-		carousel.setPlayButtonsOpacity(alpha);
+		carousel.setTimesOpacity(1);
 	})
 
 	//BACKGROUND LOGO
@@ -261,8 +262,27 @@ function onClick(event) {
 	}
 }
 
+function addStats(){
+	document.body.appendChild( stats.dom );
+	showStats = true
+}
+
+function hideStats(){
+	showStats = false;
+	document.body.removeChild( stats.dom );
+}
+
+function onKeyDown(){
+	var keyCode = window.event.code;
+	
+	if(keyCode == 'BracketLeft'){
+		if (showStats) hideStats();
+		else if (!showStats) addStats();
+	}
+}
+
 function animate() {
-	// stats.begin();
+	if (showStats) stats.begin();
 
 	let deltaTime = clock.getElapsedTime();
 	if(deltaTime > 1) deltaTime = 0;
@@ -281,7 +301,6 @@ function animate() {
 
 	if(!idle && idleTime > secondsToIdle) {
 		idle = true;
-		zoomAnimationOut.play();
 	}
 
 	//IDLE
@@ -308,6 +327,7 @@ function animate() {
 			
 			if(distanceX == 0 && Math.abs(previousDistanceX) > 10){
 				distanceX = previousDistanceX;
+
 			}else {
 				popUp.close();
 
@@ -362,7 +382,11 @@ function animate() {
 	carousel.animate();
 	ui.animate(deltaTime);
 
-	carousel.showPlayButtonOfCurrentObject();
+	if(ui.zoom.isOn){
+		carousel.showPlayButtonOfCurrentObject();
+	}else{
+		carousel.setPlayButtonsOpacity(0);
+	}
 
 	renderer.clear();
 	renderer.render(skyDomeScene, camera);
@@ -373,7 +397,7 @@ function animate() {
 	renderer.render( ui.sceneOrtho, ui.cameraOrtho );
 
 	requestAnimationFrame( animate );
-	// stats.end();
+	if (showStats) stats.end();
 }
 
 function lerp(a, b, alpha){

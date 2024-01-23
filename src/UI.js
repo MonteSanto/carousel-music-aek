@@ -21,7 +21,6 @@ class UI{
 
         this.popUp = popUp;
         this.mouse = new THREE.Vector2();
-        this.onButtonClick = onButtonClick;
 
         this.aspect = window.innerWidth / window.innerHeight;
         this.frustrum = 1;
@@ -42,7 +41,7 @@ class UI{
         let spacing = 0.01;
         let size = 0.053;
 
-        this.zoom = new Button('ZOOM', true, 'topCenter', spacing, buttonsYOffset, size * 1.2, this.sceneOrtho, this.cameraOrtho);
+        this.zoom = new Button('ZOOM', false, 'topCenter', spacing, buttonsYOffset, size * 1.2, this.sceneOrtho, this.cameraOrtho, onButtonClick);
         this.setStartButtonOpacity(1);
 
         this.createtitle("ΥΜΝΟΙ ΤΗΣ ΑΕΚ");
@@ -70,7 +69,7 @@ class UI{
 
     onClick(x, y) {
         this.getMousePosition(x, y);
-        this.zoom.onClick(this.mouse, this.onButtonClick);
+        this.zoom.onClick(this.mouse);
     }
 
     onOrthographicMouseMove() {
