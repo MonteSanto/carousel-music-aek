@@ -1,4 +1,3 @@
-// import {Howl} from 'howler';
 
 class Sound{
 

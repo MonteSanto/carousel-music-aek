@@ -18,6 +18,7 @@ class Vinyl {
   radius = 1;
   fontSizeTitle = 0.018;
   fontSizeTitle2 = 0.015;
+  fontSizeTitle3 = 0.012;
   fontSize = 0.012;
   scale = 0.00011;
   playScale = 0.00013;
@@ -40,8 +41,10 @@ class Vinyl {
   descriptionEN;
   isTitleVisible = true;
   maxOpacity = 1;
-  maxOpacityTime = 0;
-  playButtonMaxOpacity = 0;
+  maxSecondaryTitleOpacity = 1;
+  maxOpacityTime = 1;
+  playButtonMaxOpacity = 1;
+  titleScale = 1;
 
   constructor(exhibit, scene, angleInDegrees, height) {
     this.height = height;
@@ -112,7 +115,7 @@ class Vinyl {
     this.titleTroika.text = exhibit.titleGR;
     this.titleTroika.font = 'fonts/jura/Jura-Regular.ttf';
     this.titleTroika.fontSize = this.fontSizeTitle;
-    this.titleTroika.maxWidth = 0.3;
+    this.titleTroika.maxWidth = 0.5;
     this.titleTroika.color = "#ffffff"
     this.titleTroika.sync();
     scene.add(this.titleTroika);
@@ -126,6 +129,16 @@ class Vinyl {
     this.titleTroika2.color = "#ffffff"
     this.titleTroika2.sync();
     scene.add(this.titleTroika2);
+
+	//TITLE TROIKA
+	this.titleTroika3 = new Text();
+	this.titleTroika3.text = exhibit.title3;
+	this.titleTroika3.font = 'fonts/jura/Jura-Regular.ttf';
+	this.titleTroika3.fontSize = this.fontSizeTitle3;
+	this.titleTroika3.maxWidth = 0.3;
+	this.titleTroika3.color = "#ffffff"
+	this.titleTroika3.sync();
+	scene.add(this.titleTroika3);
 
 	//playTime TROIKA
 	this.playTime = new Text();
@@ -168,6 +181,7 @@ class Vinyl {
 	//TITLE
   this.titleTroika.material.opacity = opacity * this.maxOpacity;
   const textWidth = this.titleTroika.geometry.boundingBox.max.x - this.titleTroika.geometry.boundingBox.min.x;
+  this.titleTroika.fontSize = this.fontSizeTitle * this.titleScale;
 
   this.titleTroika.position.set(-textWidth / 2, 0, 0);
   this.titleTroika.translateOnAxis(currentPositionVector, this.radius);
@@ -175,13 +189,24 @@ class Vinyl {
   this.titleTroika.sync();
 
 	//TITLE 2
-  this.titleTroika2.material.opacity = opacity * this.maxOpacity;
+  this.titleTroika2.material.opacity = opacity * this.maxSecondaryTitleOpacity;
   const textWidth2 = this.titleTroika2.geometry.boundingBox.max.x - this.titleTroika2.geometry.boundingBox.min.x;
+  this.titleTroika2.fontSize = this.fontSizeTitle2 * this.titleScale;
 
   this.titleTroika2.position.set(-textWidth2 / 2, 0, 0);
   this.titleTroika2.translateOnAxis(currentPositionVector, this.radius);
   this.titleTroika2.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height - this.dateOffset - 0.025)
   this.titleTroika2.sync();
+
+	//TITLE 3
+	this.titleTroika3.material.opacity = opacity * this.maxSecondaryTitleOpacity;
+	const textWidth3 = this.titleTroika3.geometry.boundingBox.max.x - this.titleTroika3.geometry.boundingBox.min.x;
+	this.titleTroika3.fontSize = this.fontSizeTitle3 * this.titleScale;
+
+	this.titleTroika3.position.set(-textWidth3 / 2, 0, 0);
+	this.titleTroika3.translateOnAxis(currentPositionVector, this.radius);
+	this.titleTroika3.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height - this.dateOffset - 0.05)
+	this.titleTroika3.sync();
 
 	//TIME
 	let duration = this.toMinSec(this.music.sound.duration());
@@ -277,6 +302,19 @@ class Vinyl {
     if(this.vinylMesh) this.vinylMesh.rotation.z = 0;
     this.music.stop();
   }
+
+  setTitleScale(scale){
+	this.titleScale = scale;
+  }
+
+  setSecondaryTitlesOpacity(alpha){
+	this.maxSecondaryTitleOpacity = alpha;
+    this.titleTroika2.material.opacity = alpha;
+	this.titleTroika3.material.opacity = alpha;
+    this.titleTroika2.sync();
+	this.titleTroika3.sync();
+  }
+
 }
 
 export {Vinyl};
