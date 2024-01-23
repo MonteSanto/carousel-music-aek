@@ -147,11 +147,20 @@ class Carousel{
         }
     }
 
-    setTimesOpacity(alpha){
+    setZoomOpacity(alpha){
         for (let i = 0; i < this.vinyls.length; i++){
             this.vinyls[i].setTimeOpacity(alpha);
+            this.vinyls[i].setSecondaryTitlesOpacity(alpha);
         }
     }
+
+    setTitlesScale(scale){
+        for (let i = 0; i < this.vinyls.length; i++){
+            this.vinyls[i].setTitleScale(scale);
+        }
+    }
+
+    
 }
 
 export {Carousel}

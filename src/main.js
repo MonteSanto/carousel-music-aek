@@ -47,6 +47,7 @@ let zoomAnimationIn;
 
 let goToStart = false;
 let showStats = false;
+let isAnimating = false;
 
 function init(){
 	raycaster = new THREE.Raycaster();
@@ -202,18 +203,26 @@ function init(){
 
 	// ZOOM ANIMATION
 	zoomAnimationOut = new Animation(0.5, (alpha) => {
+		isAnimating = true;
 		camera.position.z = lerp(cameraDefaultZ, cameraMaxZ, alpha);
 		//carousel.vinyls.forEach(vinyl => vinyl.setOpacity(1 - alpha))
 		selectedVinyl.current = 5;
 		carousel.stopAllMusic();
 		carousel.setPlayButtonsMaxOpacity(1 - alpha);
-		carousel.setTimesOpacity(1 - alpha)
+		carousel.setZoomOpacity(1 - alpha);
+		carousel.setTitlesScale(1 + alpha);
+	}, null, () => {
+		isAnimating = false;
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
+		isAnimating = true;
 		camera.position.z = lerp(cameraMaxZ, cameraDefaultZ, alpha);
 		carousel.setPlayButtonsMaxOpacity(alpha);
-		carousel.setTimesOpacity(alpha);
+		carousel.setZoomOpacity(alpha);
+		carousel.setTitlesScale(2 - alpha);
+	}, null, () => {
+		isAnimating = false;
 	})
 
 	//BACKGROUND LOGO
@@ -247,8 +256,10 @@ function onWindowResize() {
 }
 
 function onClick(event) {
+
+	if(isAnimating) return;
+
 	if(camera.position.z == cameraMaxZ){
-		zoomAnimationIn.play();
 		ui.zoom.clickAction();
 		return;
 	}
@@ -308,6 +319,9 @@ function animate() {
 
 	if(!idle && idleTime > secondsToIdle) {
 		idle = true;
+		if(!ui.zoom.isOn){
+			ui.zoom.clickAction();
+		}
 	}
 
 	//IDLE
