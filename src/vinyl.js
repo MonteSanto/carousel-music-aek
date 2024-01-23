@@ -41,6 +41,7 @@ class Vinyl {
   isTitleVisible = true;
   maxOpacity = 1;
   maxOpacityTime = 0;
+  playButtonMaxOpacity = 0;
 
   constructor(exhibit, scene, angleInDegrees, height) {
     this.height = height;
@@ -86,7 +87,7 @@ class Vinyl {
 			this.playButtonMaterial = new THREE.MeshBasicMaterial({
 				map: playTexture,
 				transparent: this.playTexture,
-				opacity: this.buttonOpacity,
+				opacity: this.playButtonMaxOpacity,
 				alphaTest : 0.05,
 				blending: THREE.CustomBlending,
 				blendSrc: THREE.SrcAlphaFactor,
@@ -101,6 +102,7 @@ class Vinyl {
 			this.playGeometry.translate(0, this.height, 1);
 			this.playButton = new THREE.Mesh(this.playGeometry, this.playButtonMaterial);
 			this.playButton.position.set(0,-0.22,0);
+
 			scene.add(this.playButton);
 		});
 	});
@@ -230,7 +232,7 @@ class Vinyl {
   }
 
   setTimeOpacity(alpha){
-    this.maxOpacityTime=alpha;
+    this.maxOpacityTime = alpha;
     this.playTime.material.opacity = alpha;
     this.playTime.sync();
   }
@@ -239,16 +241,29 @@ class Vinyl {
     if(this.playButton) this.playButton.material.opacity = alpha;
   }
 
+
+  setPlayButtonMaxOpacity(alpha){
+    this.playButtonMaxOpacity = alpha;
+  }
+
+  showPlayButton(){
+    if(this.playButton) this.playButton.material.opacity = this.playButtonMaxOpacity;
+  }
+
+  hidePlayButton(){
+    if(this.playButton) this.playButton.material.opacity = 0;
+  }
+
   play(){
     if(this.playButton) this.playButton.material.map = this.pauseTexture;
     this.isPlaying = true;
-	this.music.play();
+	  this.music.play();
   }
 
   pause(){
     if(this.playButton) this.playButton.material.map = this.playTexture;
     this.isPlaying = false;
-	this.music.pause();
+	  this.music.pause();
   }
 
   togglePlayPause(){
@@ -257,10 +272,10 @@ class Vinyl {
   }
 
   stop(){
-	if(this.playButton) this.playButton.material = this.playButtonMaterial;
+    if(this.playButton) this.playButton.material = this.playButtonMaterial;
     this.isPlaying = false;
-	if(this.vinylMesh) this.vinylMesh.rotation.z = 0;
-	this.music.stop();
+    if(this.vinylMesh) this.vinylMesh.rotation.z = 0;
+    this.music.stop();
   }
 }
 

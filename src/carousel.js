@@ -127,23 +127,23 @@ class Carousel{
         }
     }
 
-    showPlayButtonOfCurrentObject(){
+    setPlayButtonsMaxOpacity(alpha){
+        for (let i = 0; i < this.vinyls.length; i++){
+            this.vinyls[i].setPlayButtonMaxOpacity(alpha);
+        }
+    }
+
+    showPlayButtonOfOnlyCurrentVinyl(){
         for (let i = 0; i < this.vinyls.length; i++){
             if(i == this.getCurrentObjectInViewIndex())
-                this.vinyls[i].setPlayButtonOpacity(1);
-            else this.vinyls[i].setPlayButtonOpacity(0);
+                this.vinyls[i].showPlayButton();
+            else this.vinyls[i].hidePlayButton();
         }
     }
 
     stopAllMusic(){
         for (let i = 0; i < this.vinyls.length; i++){
             this.vinyls[i].stop();
-        }
-    }
-
-    setPlayButtonsOpacity(alpha){
-        for (let i = 0; i < this.vinyls.length; i++){
-            this.vinyls[i].setPlayButtonOpacity(alpha);
         }
     }
 

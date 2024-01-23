@@ -30,7 +30,7 @@ let firstTouchId = null;
 
 let idle = false;
 
-let secondsToIdle = 60;
+let secondsToIdle = 6;
 let idleTime = secondsToIdle; // starting the app in idle mode
 let maxidleTimePause = 4
 let idleTimePause = 0;
@@ -206,13 +206,14 @@ function init(){
 		//carousel.vinyls.forEach(vinyl => vinyl.setOpacity(1 - alpha))
 		selectedVinyl.current = 5;
 		carousel.stopAllMusic();
-		carousel.setPlayButtonsOpacity(0);
-		carousel.setTimesOpacity(0)
+		carousel.setPlayButtonsMaxOpacity(1 - alpha);
+		carousel.setTimesOpacity(1 - alpha)
 	});
 
 	zoomAnimationIn = new Animation(0.5, (alpha) => {
 		camera.position.z = lerp(cameraMaxZ, cameraDefaultZ, alpha);
-		carousel.setTimesOpacity(1);
+		carousel.setPlayButtonsMaxOpacity(alpha);
+		carousel.setTimesOpacity(alpha);
 	})
 
 	//BACKGROUND LOGO
@@ -246,6 +247,12 @@ function onWindowResize() {
 }
 
 function onClick(event) {
+	if(camera.position.z == cameraMaxZ){
+		zoomAnimationIn.play();
+		ui.zoom.clickAction();
+		return;
+	}
+
 	ui.onClick(event.clientX, event.clientY);
 
 	mouseCoordinates.x = ( window.event.clientX / window.innerWidth ) * 2 - 1;
@@ -382,11 +389,7 @@ function animate() {
 	carousel.animate();
 	ui.animate(deltaTime);
 
-	if(ui.zoom.isOn){
-		carousel.showPlayButtonOfCurrentObject();
-	}else{
-		carousel.setPlayButtonsOpacity(0);
-	}
+	carousel.showPlayButtonOfOnlyCurrentVinyl();
 
 	renderer.clear();
 	renderer.render(skyDomeScene, camera);

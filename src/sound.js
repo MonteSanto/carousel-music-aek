@@ -21,7 +21,7 @@ class Sound{
                 var progressInterval = setInterval(function() {
                     var progress = (self.sound.seek() / self.sound.duration());
     
-                    console.log('Progress:', progress.toFixed(2));
+                    //console.log('Progress:', progress.toFixed(2));
             
                     if (self.sound.playing() === false) {
                         clearInterval(progressInterval);
