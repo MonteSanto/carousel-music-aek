@@ -211,6 +211,7 @@ function init(){
 		carousel.setPlayButtonsMaxOpacity(1 - alpha);
 		carousel.setZoomOpacity(1 - alpha);
 		carousel.setTitlesScale(1 + alpha);
+		carousel.setRotationOfFirstTitles(alpha);
 	}, null, () => {
 		isAnimating = false;
 	});
@@ -221,6 +222,8 @@ function init(){
 		carousel.setPlayButtonsMaxOpacity(alpha);
 		carousel.setZoomOpacity(alpha);
 		carousel.setTitlesScale(2 - alpha);
+		carousel.setRotationOfFirstTitles(1 - alpha);
+
 	}, null, () => {
 		isAnimating = false;
 	})
