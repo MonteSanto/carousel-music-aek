@@ -41,7 +41,7 @@ class UI{
         let spacing = 0.01;
         let size = 0.053;
 
-        this.zoom = new Button('ZOOM', false, 'topCenter', spacing, buttonsYOffset, size * 1.2, this.sceneOrtho, this.cameraOrtho, onButtonClick);
+        this.zoom = new Button('ZOOM', true, 'topCenter', spacing, buttonsYOffset, size * 1.2, this.sceneOrtho, this.cameraOrtho, onButtonClick);
         this.setStartButtonOpacity(1);
 
         this.createtitle("ΥΜΝΟΙ ΤΗΣ ΑΕΚ");
