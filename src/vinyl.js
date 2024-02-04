@@ -300,14 +300,14 @@ class Vinyl {
   }
 
   stop(){
-    if(this.playButton) this.playButton.material = this.playButtonMaterial;
+    if(this.playButton) this.playButton.material.map = this.playTexture;
     this.isPlaying = false;
     if(this.vinylMesh) this.vinylMesh.rotation.z = 0;
     this.music.stop();
   }
 
   setTitleScale(scale){
-	this.titleScale = scale;
+	  this.titleScale = scale;
   }
 
   setSecondaryTitlesOpacity(alpha){

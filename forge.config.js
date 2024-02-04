@@ -1,8 +1,9 @@
 module.exports = {
   packagerConfig: {
+  },
+  rebuildConfig: {
     asar: false,
   },
-  rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
