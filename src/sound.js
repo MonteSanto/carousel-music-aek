@@ -3,6 +3,7 @@ class Sound{
 
     source;
     sound;
+    isPlaying = false;
 
     constructor(source){
         this.createSound(source, 0.5, false);

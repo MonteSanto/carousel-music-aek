@@ -160,12 +160,6 @@ class Carousel{
         }
     }
 
-    setRotationOfFirstTitles(alpha){
-        for (let i = 0; i < this.vinyls.length; i++){
-            this.vinyls[i].setRotationOfFirstTitle(alpha);
-        }
-    }
-
     
 }
 
