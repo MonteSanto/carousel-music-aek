@@ -17,10 +17,10 @@ class Vinyl {
   titleTroika;
   radius = 1;
   fontSizeTitle = 0.018;
-  fontSizeTitle2 = 0.015;
-  fontSizeTitle3 = 0.012;
+  fontSizeTitle2 = 0.011;
+  fontSizeTitle3 = 0.011;
   fontSize = 0.012;
-  scale = 0.000095;
+  scale = 0.000078;
   playScale = 0.00010;
   vinylMaterial;
   playButtonMaterial;
@@ -67,7 +67,7 @@ class Vinyl {
 		});
 	
 		const planeWidth = texture.image.naturalWidth * this.scale;
-		const planeHeight = texture.image.naturalHeight * this.scale * this.radius;
+		const planeHeight = texture.image.naturalHeight * this.scale;
 	
 		let geometry = new THREE.PlaneGeometry(planeWidth, planeHeight);
 		this.vinylMesh = new THREE.Mesh(geometry, this.vinylMaterial);
@@ -149,7 +149,7 @@ class Vinyl {
     this.titleTroika3.color = "#ffffff"
     this.titleTroika3.sync(() => {
       const textWidth = this.titleTroika3.geometry.boundingBox.max.x - this.titleTroika3.geometry.boundingBox.min.x;
-      this.titleTroika3.position.set(-textWidth / 2, -this.dateOffset - 0.05, 0);
+      this.titleTroika3.position.set(-textWidth / 2, -this.dateOffset - 0.045, 0);
     });
     this.titleObject.add(this.titleTroika3);
 
