@@ -32,6 +32,7 @@
         {imagePath: 'images/29.png', id:7, titleGR: 'ΑΕΚ', title2: 'ΙΔΕΑ ΕΧΩ ΕΣΕΝ ΚΑΙ ΤΗΝ ΑΓΙΑ ΣΟΦΙΑΝ', title3: 'ΤΣΙΦΤΕΛΙΔΗΣ ΓΙΩΡΓΟΣ', musicPath: 'music/29.mp3'},
         {imagePath: 'images/30.png', id:7, titleGR: 'ΤΙΓΡΗΣ ΑΕΚ', title2: 'ΔΗΜΗΤΡΗΣ ΚΑΡΑΣΑΒΒΙΔΗΣ', title3: '', musicPath: 'music/30.mp3'},
         {imagePath: 'images/31.png', id:7, titleGR: 'ΜΠΑΜΠΑ ΜΟΥ ΞΕΡΩ', title2: 'STAVENTO', title3: '', musicPath: 'music/31.mp3'},
+        {imagePath: 'images/32.png', id:7, titleGR: 'ΓΗΠΕΔΟ ΤΗΣ ΑΕΚ', title2: 'ΛΕΥΤΕΡΗΣ ΠΑΝΤΑΖΗΣ', title3: '', musicPath: 'music/32.mp3'},
     ];
 
 export {vinylsList}
