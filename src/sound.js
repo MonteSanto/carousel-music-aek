@@ -6,7 +6,8 @@ class Sound{
     isPlaying = false;
 
     constructor(source){
-        this.createSound(source, 0.5, false);
+        //this.createSound(source, 0.5, false);
+        this.source = source;
     }
 
     createSound(source, volume, loop){
@@ -19,10 +20,6 @@ class Sound{
                 console.log('Audio is playing');
                 
                 var progressInterval = setInterval(function() {
-                    var progress = (self.sound.seek() / self.sound.duration());
-    
-                    //console.log('Progress:', progress.toFixed(2));
-            
                     if (self.sound.playing() === false) {
                         clearInterval(progressInterval);
                     }
@@ -33,6 +30,7 @@ class Sound{
             },
             onstop: function() {
                 //console.log('Audio is stopped');
+                this.sound.unload();
             }
         });
     }
@@ -43,19 +41,22 @@ class Sound{
     }
 
     play(){
+        this.createSound(this.source, 0.5, false);
         this.sound.play();
     }
 
     pause(){
-        this.sound.pause();
+        if(this.sound) this.sound.pause();
     }
 
     stop(){
-        this.sound.stop();   
+        if(this.sound) this.sound.stop();   
     }
 
     isMusicPlaying() {
-        return this.sound && this.sound.playing();
+        if(this.sound){
+            return this.sound && this.sound.playing();
+        }
     }
 }
 

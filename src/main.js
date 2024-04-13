@@ -320,7 +320,7 @@ function animate() {
 		previousVinylInView = currentVinylInView;
 	}
 
-	if(currentVinylInView.music.sound.playing()) idleTime = 0;
+	if(currentVinylInView.music.sound?.playing()) idleTime = 0;
 
 	if(!idle && idleTime > secondsToIdle) {
 		idle = true;

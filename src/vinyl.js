@@ -163,7 +163,7 @@ class Vinyl {
     this.playTime.maxWidth = 0.10;
     this.playTime.color = "#ffffff"
     this.playTime.sync();
-    scene.add(this.playTime);
+    //scene.add(this.playTime);
 
     //DESCRIPTIONS
     this.titleGR = exhibit.titleGR;
@@ -213,8 +213,8 @@ class Vinyl {
     this.titleTroika.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height);
 
     //TIME
-    let duration = this.toMinSec(this.music.sound.duration());
-    let seek =  this.toMinSec(this.music.sound.seek());
+    let duration = this.toMinSec(this.music.sound?.duration());
+    let seek =  this.toMinSec(this.music.sound?.seek());
     this.playTime.text = seek + ' / ' + duration;
 
     this.playTime.material.opacity = opacity * this.maxOpacityTime;
