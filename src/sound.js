@@ -6,14 +6,13 @@ class Sound{
     isPlaying = false;
 
     constructor(source){
-        //this.createSound(source, 0.5, false);
         this.source = source;
     }
 
-    createSound(source, volume, loop){
+    createSound(volume, loop){
         var self = this;
         this.sound = new Howl({
-            src: [source],
+            src: [this.source],
             volume: volume,
             loop: loop,
             onplay: function() {
@@ -30,18 +29,22 @@ class Sound{
             },
             onstop: function() {
                 //console.log('Audio is stopped');
-                this.sound.unload();
+                self.sound.unload();
             }
         });
     }
 
+    unload(){
+        if(this.sound) this.sound.unload();
+    }
+
     changeMusicSource(source) {
         this.sound.unload();
-        this.createSound(source, 0.5, false);
+        this.createSound(1, false);
     }
 
     play(){
-        this.createSound(this.source, 0.5, false);
+        this.createSound(1, false);
         this.sound.play();
     }
 

@@ -14,7 +14,7 @@ let speed = 0;
 
 let spiraleThreadHeight = 0;
 let itemsPerRevolution = 21;
-let cameraDefaultZ = 1.55;
+let cameraDefaultZ = 1.45;
 let cameraMaxZ = 3;
 
 const scrollSpeed = 0.05;

@@ -13,12 +13,12 @@ class Vinyl {
   currentAnglePlus180 = 0
   yVector = new THREE.Vector3(0, 1, 0);
   height;
-  dateOffset = -0.19;
+  dateOffset = -0.15;
   titleTroika;
   radius = 1;
-  fontSizeTitle = 0.018;
-  fontSizeTitle2 = 0.011;
-  fontSizeTitle3 = 0.011;
+  fontSizeTitle = 0.014;
+  fontSizeTitle2 = 0.010;
+  fontSizeTitle3 = 0.010;
   fontSize = 0.012;
   scale = 0.000078;
   playScale = 0.00010;
@@ -53,6 +53,15 @@ class Vinyl {
     this.currentAnglePlus180 = THREE.MathUtils.degToRad(angleInDegrees + 180);
     
 	  this.music = new Sound(exhibit.musicPath);
+
+    let tempMusic = new Sound(exhibit.musicPath);
+    tempMusic.createSound(0, false);
+
+    this.duration = 0;
+    tempMusic.sound.once('load', () => {
+      this.duration = this.toMinSec(tempMusic.sound.duration());
+      tempMusic.unload();
+    });
 
     getTextureLoader().load(exhibit.imagePath, (texture) => {
 		this.vinylMaterial = new THREE.MeshBasicMaterial({
@@ -163,7 +172,7 @@ class Vinyl {
     this.playTime.maxWidth = 0.10;
     this.playTime.color = "#ffffff"
     this.playTime.sync();
-    //scene.add(this.playTime);
+    scene.add(this.playTime);
 
     //DESCRIPTIONS
     this.titleGR = exhibit.titleGR;
@@ -213,9 +222,13 @@ class Vinyl {
     this.titleTroika.translateOnAxis(new THREE.Vector3(0, 1, 0), this.height);
 
     //TIME
-    let duration = this.toMinSec(this.music.sound?.duration());
-    let seek =  this.toMinSec(this.music.sound?.seek());
-    this.playTime.text = seek + ' / ' + duration;
+    let seek =  this.toMinSec(0);
+
+    if(this.music.sound){
+      seek = this.toMinSec(this.music.sound.seek());
+    }
+
+    this.playTime.text = seek + ' / ' + this.duration;
 
     this.playTime.material.opacity = opacity * this.maxOpacityTime;
     const playTimeTextWidth = this.playTime.geometry.boundingBox.max.x - this.playTime.geometry.boundingBox.min.x;
